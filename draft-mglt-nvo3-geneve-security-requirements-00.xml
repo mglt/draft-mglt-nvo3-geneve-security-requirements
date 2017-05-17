@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc='yes' ?>
+<?rfc tocdepth='3' ?>
+<?rfc sortrefs='yes' ?>
+<rfc category="std" docName="draft-mglt-nvo3-geneve-security-requirements-00" ipr="trust200902">
+  <front>
+    <title>Geneve Protocol Security Requirements</title>
+    <author surname="Migault" initials="D.M." fullname="Daniel Migault">
+      <organization>Ericsson</organization>
+      <address>
+        <postal>
+          <street>8400 boulevard Decarie</street>
+          <city>Montreal, QC</city>
+          <code>H4P 2N2</code>
+          <country>Canada</country>
+        </postal>
+        <email>daniel.migault@ericsson.com</email>
+      </address>
+    </author>
+    <date day="10" month="May" year="2017"/>
+    <area>Routing</area>
+    <workgroup>NVO3</workgroup>
+    <abstract>
+      <t>
+This draft lists the security requirements associated to the Generic Network Virtualization Encapsulation (Geneve) <xref target="I-D.ietf-nvo3-geneve"/>.
+</t>
+    </abstract>
+  </front>
+  <middle>
+    <section title="Requirements notation">
+      <t>
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.
+</t>
+    </section>
+    <section title="Introduction">
+      <t>
+A cloud provider may administrate Tenant Systems belonging to one or multiple tenants using an NVO3 overlay network. The NVO3 overlay enables multiple Virtual Networks to coexist over a shared infrastructure, and a Virtual Network may be distributed within a single data center or between different data centers. The NVO3 overlay network is constituted by NVO3 forwarding elements as well as Network Virtualization Edges (NVE) <xref target="RFC8014"/>. Traffic is thus steers between NVEs using Virtual Network using Generic Network Virtualization Encapsulation (Geneve) <xref target="I-D.ietf-nvo3-geneve"/>.
+</t>
+      <t>
+This document analyses and lists the security requirements Geneve needs to meet in order to enable the NVO3 overlay to be securely deployed. It is expected that these requirements will help design the appropriated security options for Geneve as well as provides some basis security notion for further Geneve deployments.
+</t>
+      <t>
+When a tenant subscribes to a cloud provider for hosting its Tenant Systems, the cloud provider manages the NVO3 overlay network on behalf of the tenant <xref target="RFC7365"/>. It may also, but not necessarily manage the infrastructure supporting the overlay network.  The Geneve security requirements listed in this document aims at providing the cloud provider the necessary options to ensure the tenant:
+</t>
+      <t>
+        <list style="numbers">
+          <t>
+Tenants Isolation, that is Tenant System inside a Virtual Network are isolated from other Tenants Virtual Networks. This Tenants isolation mostly prevents traffic from one tenant to be redirected to another tenant as well as traffic from one tenant being injected into another tenant.
+
+</t>
+          <t>
+NVO3 robustness, that is a rogue elements of the NVO3 overlay network will will have limited impacts over the NVO3 overlay network itself as well as over Tenants Systems.
+
+</t>
+          <t>
+NVO3 isolation of the infrastructure, that is information in transit is not subject to passive monitoring. Information in transit concerns both element regarding the organization of the NVO3 overlay network as well as information from the tenant.
+
+</t>
+        </list>
+      </t>
+    </section>
+    <section title="Tenants Isolation">
+      <t>
+Tenants isolation prevents communications from one tenant to leak into another tenant Virtual Network.  This section is focused on an NVO3 overlay network perspective which means:
+</t>
+      <t>
+        <list style="numbers">
+          <t>
+Only communications between NVEs are considered. In other words, the transmission from the NVE to the Tenant System itself is out of the scope of this section.
+
+</t>
+          <t>
+Isolation is only broken by NVO3 rogue NVE or rogue forwarding elements. In other words, breaking isolation using other elements are out of scope of this section
+
+</t>
+        </list>
+      </t>
+      <t>
+Suppose Tenant A and Tenant B are two distinct tenants and are expected to remain isolated by the L3 overlay. The attacks considered in this section are the following:
+</t>
+      <t>
+        <list style="numbers">
+          <t>
+Traffic injection by NVE Identity spoofing: A rogue NVE from Tenant A may be used to inject packets inside Tenant B. This could be done for example by using an outer IP address associated to Tenant B NVE or forwarding elements or the Virtual Network Identifier.
+
+</t>
+          <t>
+Traffic injection by Geneve Header spoofing: A rogue forwarding element controlled by Tenant A may modify the Geneve header information, so that the next legitimate forwarding element typically forwards the packets to Tenant B.
+
+</t>
+          <t>
+Traffic hijacking by Geneve Header spoofing:  A rogue forwarding element controlled by Tenant A may modify the Geneve header information in order to redirect packets from Tenant B to some Tenant System controlled by Tenant A.
+
+</t>
+          <t>
+Passive monitoring: Tenant A may be willing to passively monitor the traffic of Tenants B Tenant Systems by redirecting traffic to Tenants A, and then resending this traffic back to Tenants A. Such attack requires to be able to redirect traffic out of Tenant B and re-inject traffic to Tenant B.
+
+</t>
+        </list>
+      </t>
+      <t>
+In case all NVO3 elements are corrupted or is consequently misconfigured, there are few mechanisms that can detect or prevent such misbehavior&#8217;s. The level of corruption is too high and considered as out of scope of the document. On the other hand, if there is at least one legitimate NVO3 forwarding element or a legitimate NVE, these attacks may not happen when the following requirements are met:
+</t>
+      <t>
+        <list style="hanging">
+          <t hangText="REQ1:">
+NVO3 forwarding elements SHOULD be able to associate the source and destination NVE of an incoming packet. This association SHOULD be made possible by reading the Geneve Header only.  Upon reading these information, the NVO3 forwarding node is expected to check whether these NVE source and destination are expected and discard the packet otherwise.
+</t>
+          <t hangText="REQ2:">
+NVO3 forwarding elements SHOULD be able to authenticate source and destination NVE as well as the Geneve Header.  The element to authenticate as well as the authentication SHOULD be made possible by reading the Geneve Header. A failure in the authentication is expected to result in discarding the packet.
+</t>
+        </list>
+      </t>
+      <t>
+Note that it is assumed that a legitimate forwarding element will be able to mitigate such attacks. This means that in order to perform such attack, the attacker needs to take control of all NVE and on path Geneve forwarding elements. The more elements are on path the more unlikely such attack will succeed.  On the other hand, when NVE are shared by multiple Tenants, a single element guarantees the isolation between the tenants. This attack becomes then possible if that NVE is corrupted.  Similarly, when NVE are not shared and the overlay only consists in communications between NVE without any additional on path NVO3 forwarding elements two different rogue NVE may also be sufficient to perform passive monitoring.
+</t>
+      <t>
+IPsec or TLS meet the requirements above. Encrypting the flows with IPsec or TLS prevents any on path Geneve forwarding element to read the information in the Geneve Header. This leaves the NVO3 overlay network as a NVE-to-NVE network. Inside a given domain, such topology provides little flexibility and is unlikely to scale well with the number of security associations. On the other hand, when the forwarding elements of the NVO3 overlay network are in distinct domains, such solution is recommended.  IPsec and TLS also have an non encrypted mode however, TLS1.3 does not consider the NULL encryption in its specifications. The use of ESP with ENCR_NULL or AH between the NVEs may be used in transport mode or in tunnel mode when IP is encapsulated in IP. While it enables a Geneve forwarding element to read the packet, it prevents any authorized modification of the packets by a legitimate forwarding element. In addition, it requires the forwarding element to implement IPsec, with IP based policies instead of NVI or any Geneve Header information based polices. As a result, it is recommended to implement these requirements with Geneve options.
+</t>
+    </section>
+    <section title="NVO3 Robustness">
+      <t>
+While Tenant isolation prevents one Tenant to inject packets into another Tenants, it does not prevent a rogue or misconfigured node to replay a packet, to load a specific Tenant System with a modified Geneve payload or to abuse the NVO3 overlay network.
+</t>
+      <t>
+        <list style="numbers">
+          <t>
+A rogue NVO3 overlay forwarding element on path of one Tenants traffic may replay a valid packet to load the network. This can typically be seen as a volumetric attack in order to disrupt the tenants domain, a specific Tenant System or the multi Tenant infrastructure itself. In some cases, especially when the tenants costs are evaluate on the necessary computing resources, such attacks may target an increase of the tenants costs.
+
+</t>
+          <t>
+When traffic between tenants are not protected, a rogue NVO3 overlay element may forward a modified packet over a valid Geneve Header. The crafted packet may for example, include a specifically crafted application payload intended for a specific Tenant Systems application.  Other examples includes a larger randomly craft payload intended to load one specific application.
+
+</t>
+          <t>
+The NVO3 forwarding policies are engineered according to the various types of flows with their associated volumetry and requirements. For example, some OAM flows are expected to be associated with a higher priority then standard data plane flows.  Similarly, the use of various Geneve Header parameters or options may introduce different treatments.  Updating the Geneve header may result in counter all optimizations used to setup a performant infrastructure and thus affect the tenants.
+
+</t>
+        </list>
+      </t>
+      <t>
+In order to avoid the above mentioned attacks, the following requirements should be considered:
+</t>
+      <t>
+        <list style="hanging">
+          <t hangText="REQ3:">
+Geneve Header SHOULD be bound to the forwarded payload. By reading the Geneve Header and the Payload, the NVO3 forwarding element SHOULD be able to validate the Geneve Header corresponds to the Geneve payload. In case of mismatch the NVO3 forwarding element is expected to discard the packet.
+</t>
+          <t hangText="REQ4:">
+Geneve forwarding element SHOULD be provided anti replay mechanisms. By reading the Geneve Header, the NVO3 forwarding element is expected to detect a packet has been replayed or at least limit the replay windows. When a packet is detected as being replayed, the NVO3 forwarding element is expected to discard this packet.
+</t>
+        </list>
+      </t>
+    </section>
+    <section title="Infrastructure Isolation">
+      <t>
+The cloud provider managing the NVO3 overlay network may be willing to isolate the communications between Tenant Systems as well as the organization of the NVO3 overlay from the infrastructure. Such isolation may be performed by encrypting the data in transit within the NVO3 overly network.
+</t>
+      <section title="Tenants Communication">
+        <t>
+The main purpose for encrypting tenants communication inside the NVO3 overlay network is to prevent that external parties such a infrastructure providers may access to the information exchanged between Tenant System exchanged via the NVO3 overlay network. A typical example comes would be the infrastructure provider used by the NVO3 overlay network.
+</t>
+        <t>
+In addition, encryption of the data in transit in the NVO3 overlay network may also be one way to prevent the leakage of information when tenant isolation is broken. Encryption is not expected to enforce tenant isolation, but if information can hardly be used by another tenant it may limit the interest in breaking such isolation to still information as well as it might reduce the risks of leaking some confidential information.
+</t>
+        <t>
+          <list style="hanging">
+            <t hangText="REQ5:">
+NVE-to-NVE communications SHOULD be able to able to encrypt and authenticate the Geneve payload. Only the involved NVE SHOULD be able to encrypt, decrypt and authenticate the payload. The authentication of the encrypted payload may not be bound to the Geneve Header, as such authentication would prevent the Geneve Header to be updated by on path NVO3 forwarding elements. Upon receiving an encrypted Geneve payload, the receiving NVE is expected to authenticate the payload and reject it in case of mismatch.
+</t>
+          </list>
+        </t>
+        <t>
+IPsec or TLS provides end-to-end encryption for NVE communications.  However, as the Geneve Header would be encrypted, these mechanisms cannot be used are general mechanisms for the overlay network.
+</t>
+        <t>
+Encrypting Geneve payload by the NVE prevents disclosing the Geneve payload to third party in case of leakage. However, such service is provided by the cloud provider and the tenant has little control over it. In most cases, if the tenant is willing to enforce data confidentiality, it is recommended that it encrypts communications between Tenants systems using IPsec or TLS. By doing so, the cloud provider would not even have access to such this information. While encryption is being performed by the tenant, a cloud provider may be willing to avoid re-encrypting that same content. Instead, the cloud provider may prefer to only encrypt the tenants informations that have not been encrypted by TLS or IPsec. Doing so is expected to reduce the necessary resource for encrypting.
+</t>
+        <t>
+          <list style="hanging">
+            <t hangText="REQ6:">
+NVE SHOULD be able to selectively encrypt only the sections that are not encrypted by the Tenant System. If the Tenant Systems encrypts its communications with TLS, only the IP, transport (TCP / UDP) and TLS/DTLS section should be encrypted while only the IP header and ESP header is expected to be encrypted when tenants' communications are encrypted with ESP. Upon receiving these information the receiving NVE SHOULD be able to check the transmitted information is properly authenticated. In case of authentication mismatch, the packet is expected to be rejected.  Otherwise, the packet is expected to rebuilt and forwarded to the destination Tenants System.
+</t>
+          </list>
+        </t>
+      </section>
+      <section title="NVO3 Architecture">
+        <t>
+In addition, to the information exchanged between Tenant Systems, the cloud provider may also avoid revealing the distribution of the Tenant Systems through the data center. In fact a passive attacker may observe the NVI in the Geneve header in order to derive the communication pattern between the Tenant Systems. Other parameters or options may reveal other kind of informations. One possibility is to encrypt the information, but other transformations may also apply.
+</t>
+        <t>
+          <list style="hanging">
+            <t hangText="REQ7:">
+Geneve SHOULD be provided means to hide the information contained in the Geneve Header to a passive attacker. This information SHOULD be retrieved only by the expected NVO3 forwarding elements.
+</t>
+            <t hangText="REQ8:">
+Geneve SHOULD be able to have encrypted options only accessible to selected forwarding element.
+</t>
+          </list>
+        </t>
+      </section>
+    </section>
+    <section title="IANA Considerations">
+      <t>
+There are no IANA consideration for this document.
+</t>
+    </section>
+    <section anchor="sec-considerations" title="Security Considerations">
+      <t>
+The whole document is about security.
+</t>
+    </section>
+    <section title="Acknowledgment"/>
+  </middle>
+  <back>
+    <references title="Normative References">
+      <reference anchor="RFC2119" target="http://www.rfc-editor.org/info/rfc2119">
+        <front>
+          <title>Key words for use in RFCs to Indicate Requirement Levels</title>
+          <author initials="S." surname="Bradner" fullname="S. Bradner">
+            <organization/>
+          </author>
+          <date year="1997" month="March"/>
+          <abstract>
+            <t>
+In many standards track documents several words are used to signify the requirements in the specification.  These words are often capitalized. This document defines these words as they should be interpreted in IETF documents.  This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.
+</t>
+          </abstract>
+        </front>
+        <seriesInfo name="BCP" value="14"/>
+        <seriesInfo name="RFC" value="2119"/>
+        <seriesInfo name="DOI" value="10.17487/RFC2119"/>
+        <format type="TXT" target="http://www.rfc-editor.org/info/rfc2119"/>
+      </reference>
+      <reference anchor="I-D.ietf-nvo3-geneve">
+        <front>
+          <title>Geneve: Generic Network Virtualization Encapsulation</title>
+          <author initials="J" surname="Gross" fullname="J Gross">
+            <organization/>
+          </author>
+          <author initials="I" surname="Ganga" fullname="I Ganga">
+            <organization/>
+          </author>
+          <author initials="T" surname="Sridhar" fullname="T Sridhar">
+            <organization/>
+          </author>
+          <date year="2017" month="March"/>
+          <abstract>
+            <t>
+Network virtualization involves the cooperation of devices with a wide variety of capabilities such as software and hardware tunnel endpoints, transit fabrics, and centralized control clusters.  As a result of their role in tying together different elements in the system, the requirements on tunnels are influenced by all of these components.  Flexibility is therefore the most important aspect of a tunnel protocol if it is to keep pace with the evolution of the system.  This draft describes Geneve, a protocol designed to recognize and accommodate these changing capabilities and needs.
+</t>
+          </abstract>
+        </front>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-nvo3-geneve-04"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-nvo3-geneve-04.txt"/>
+      </reference>
+    </references>
+    <references title="Informational References">
+      <reference anchor="RFC8014" target="http://www.rfc-editor.org/info/rfc8014">
+        <front>
+          <title>An Architecture for Data-Center Network Virtualization over Layer 3 (NVO3)</title>
+          <author initials="D." surname="Black" fullname="D. Black">
+            <organization/>
+          </author>
+          <author initials="J." surname="Hudson" fullname="J. Hudson">
+            <organization/>
+          </author>
+          <author initials="L." surname="Kreeger" fullname="L. Kreeger">
+            <organization/>
+          </author>
+          <author initials="M." surname="Lasserre" fullname="M. Lasserre">
+            <organization/>
+          </author>
+          <author initials="T." surname="Narten" fullname="T. Narten">
+            <organization/>
+          </author>
+          <date year="2016" month="December"/>
+          <abstract>
+            <t>
+This document presents a high-level overview architecture for building data-center Network Virtualization over Layer 3 (NVO3) networks.  The architecture is given at a high level, showing the major components of an overall system.  An important goal is to divide the space into individual smaller components that can be implemented independently with clear inter-component interfaces and interactions.  It should be possible to build and implement individual components in isolation and have them interoperate with other independently implemented components.  That way, implementers have flexibility in implementing individual components and can optimize and innovate within their respective components without requiring changes to other components.
+</t>
+          </abstract>
+        </front>
+        <seriesInfo name="RFC" value="8014"/>
+        <seriesInfo name="DOI" value="10.17487/RFC8014"/>
+        <format type="TXT" target="http://www.rfc-editor.org/info/rfc8014"/>
+      </reference>
+      <reference anchor="RFC7365" target="http://www.rfc-editor.org/info/rfc7365">
+        <front>
+          <title>Framework for Data Center (DC) Network Virtualization</title>
+          <author initials="M." surname="Lasserre" fullname="M. Lasserre">
+            <organization/>
+          </author>
+          <author initials="F." surname="Balus" fullname="F. Balus">
+            <organization/>
+          </author>
+          <author initials="T." surname="Morin" fullname="T. Morin">
+            <organization/>
+          </author>
+          <author initials="N." surname="Bitar" fullname="N. Bitar">
+            <organization/>
+          </author>
+          <author initials="Y." surname="Rekhter" fullname="Y. Rekhter">
+            <organization/>
+          </author>
+          <date year="2014" month="October"/>
+          <abstract>
+            <t>
+This document provides a framework for Data Center (DC) Network Virtualization over Layer 3 (NVO3) and defines a reference model along with logical components required to design a solution.
+</t>
+          </abstract>
+        </front>
+        <seriesInfo name="RFC" value="7365"/>
+        <seriesInfo name="DOI" value="10.17487/RFC7365"/>
+        <format type="TXT" target="http://www.rfc-editor.org/info/rfc7365"/>
+      </reference>
+    </references>
+  </back>
+</rfc>
