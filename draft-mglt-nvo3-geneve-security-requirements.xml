@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc='yes' ?>
+<?rfc tocdepth='3' ?>
+<?rfc sortrefs='yes' ?>
+<rfc category="info"
+docName="draft-mglt-nvo3-geneve-security-requirements-01" ipr="trust200902">
+  <front>
+    <title>Geneve Protocol Security Requirements</title>
+
+    <author surname="Migault" initials="D.M." fullname="Daniel Migault">
+      <organization>Ericsson</organization>
+      <address>
+        <postal>
+          <street>8400 boulevard Decarie</street>
+          <city>Montreal, QC</city>
+          <code>H4P 2N2</code>
+          <country>Canada</country>
+        </postal>
+        <email>daniel.migault@ericsson.com</email>
+      </address>
+    </author>
+
+    <author surname="Boutros" initials="S.B." fullname="Sami Boutros">
+      <organization>VMware, Inc</organization>
+      <address>
+        <email>sboutros@vmware.com</email>
+      </address>
+    </author>
+
+    <author surname="Wing" initials="D.W." fullname="Dan Wing">
+      <organization>VMware, Inc</organization>
+      <address>
+        <email>dwing@vmware.com</email>
+      </address>
+    </author>
+
+    <author surname="Krishnan" initials="S.K." fullname="Suresh Krishna">
+      <organization>Kaloom</organization>
+      <address>
+        <email>suresh@kaloom.com</email>
+      </address>
+    </author>
+
+
+    <date/>
+    <area>Routing</area>
+    <workgroup>NVO3</workgroup>
+    <abstract>
+      
+<t>The document defines the security requirements to protect tenants
+overlay traffic against security threats from the NVO3 network
+components that are interconnected with tunnels implemented using
+Generic Network Virtualization Encapsulation (Geneve). </t>
+
+    </abstract>
+  </front>
+  <middle>
+    <section title="Requirements notation">
+      
+<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in <xref
+target="RFC2119"/>.</t>
+
+    </section>
+    <section title="Introduction">
+
+<t>The network virtualization overlay over Layer 3 (NVO3)  as depicted
+in <xref target="arch"/>, allows an overlay cloud provider to provide a
+logical L2/L3 interconnect for the Tenant Systems TSes that belong to a
+specific tenant network. A packet received from a tenant system is
+encapsulated by the ingress Network Virtualization Edge (NVE). The
+encapsulated packet is then sent to the remote NVE through a proper
+tunnel. When reaching the egress NVE of the tunnel, the packet is
+decapsulated and forwarded to the target tenant system. The L2/L3
+address mappings to the remote NVE(s) are distributed to the NVEs by a
+logically centralized Network Virtualization Authority (NVA) or using a
+distributed control plane such as Ethernet-VPN.  In a datacenter, the
+NVO3 tunnels can be implemented using Generic Network Virtualization
+Encapsulation (Geneve) <xref target="I-D.ietf-nvo3-geneve"/>.  The
+Geneve tunnels overlay network enable multiple Virtual Networks to
+coexist over a shared underlay infrastructure, and a Virtual Network may
+span a single data center or multiple data centers.</t>  
+
+<t>The underlay infrastructure on which the multi-tenancy overlay
+networks are hosted, can be owned and provided by an underlay provider
+who may be different from the overlay cloud provider.</t>
+
+
+<figure anchor="arch" title="Generic Reference Model for Network
+Virtualization Overlays [RFC7365] ">
+<artwork align="center"><![CDATA[
++--------+                                    +--------+
+| Tenant +--+                            +----| Tenant |
+| System |  |                           (')   | System |
++--------+  |    .................     (   )  +--------+
+            |  +---+           +---+    (_)
+            +--|NVE|---+   +---|NVE|-----+
+               +---+   |   |   +---+
+               / .    +-----+      .
+              /  . +--| NVA |      .
+             /   . |  +-----+      .
+            |    . |               .
+            |    . |  L3 Overlay +--+--++--------+
++--------+  |    . |   Network   | NVE || Tenant |
+| Tenant +--+    . |             |     || System |
+| System |       .  \ +---+      +--+--++--------+
++--------+       .....|NVE|.........
+                      +---+
+                        |
+                        |
+              =====================
+                |               |
+            +--------+      +--------+
+            | Tenant |      | Tenant |
+            | System |      | System |
+            +--------+      +--------+
+]]></artwork></figure>
+
+<t>This document discusses the security risks that a Geneve based NVO3
+network may encounter and tries to provide a list of essential security
+requirements that needs to be fulfilled. In addition, this document
+lists the requirements to protect the Geneve packet components defined
+in <xref target="I-D.ietf-nvo3-geneve"/> that include the Geneve tunnel IP and UDP
+header, the Geneve Header, Geneve options, and inner payload. Protecting
+the complete Geneve packet is out of scope of this document, given that
+this can be supported using existing mechanisms.</t> 
+
+<t>This document assumes that a tenant subscribes to an overlay cloud
+provider for hosting its Tenant Systems, the cloud provider manages the
+Geneve overlay network on behalf of the tenant.  The overlay network
+will be hosted on an underlay network infrastructure, that may be
+managed by another underlay network provider.</t>
+
+<t>The security requirements in this document aims at providing the overlay
+cloud provider the necessary options to ensure:
+
+<list style="numbers">
+
+<t>Delivering tenant payload traffic and ensuring privacy, integrity
+and isolation over the overlay and underlay networks, as well preventing
+tenant traffic from being redirected or injected to other tenants.</t>
+
+<t>Protecting tenant traffic from rogue devices in the providers of
+Geneve overlay or underlay networks.</t>
+
+</list></t>
+
+<t>In summary, the document defines the security requirements to protect
+tenants overlay traffic against security threats from the NVO3 network
+components that are interconnected with tunnels implemented using
+Geneve. As well, the document strongly recommend to re-use existing
+security protocols like IP Security (IPSec) <xref target="RFC4301"/> and
+Transport Layer Security (TLS) <xref target="RFC5246"/>, and existing
+encryption algorithms,  and authentication protocols.</t>
+
+
+<t>Authentication requirements for NVO3 devices, automated key
+management, as well as packet level security providing confidentiality,
+integrity and authorization requirements defined in <xref
+target="I-D.ietf-nvo3-security-requirements"/> are also requirements for
+this document.</t>
+
+</section>
+
+<section title="Terminology">
+
+<t>This document uses the terminology of <xref target="RFC8014"/>, <xref
+target="RFC7365"/> and <xref target="I-D.ietf-nvo3-geneve"/></t>
+
+</section>
+
+<section title="Security Threats">
+
+<t>Attacks from compromised NVO3 and underlay network devices, and
+attacks from compromised tenant systems defined in <xref
+target="I-D.ietf-nvo3-security-requirements"/> are considered for the
+Geneve overlay network. Furthermore, the attackers knowing the details
+of the Geneve packets can perform their attacks by changing fields in
+the Geneve tunnel header, base header, Geneve options and Geneve packet
+inner payload. </t>
+
+<t>Typical threats include traffic injection, traffic redirection,
+traffic replay. Based on these threats, this document derive the
+security requirements.</t>
+
+<t>There are multiple motivations to inject illegitimate traffic in to a
+tenants network. When the rogue node is the path of the TS traffic, the
+rogue node may be able to inject and receive the corresponding messages
+back. On the other hand, if the attacker is not on the path of the TS
+traffic it may be limited to only inject traffic to a TS without
+receiving any response back. When rogue nodes has access to the traffic
+in both directions, the possibilities are limited only limited by the
+capabilities of the other on path elements - NVO3 elements, NVE or TS -
+to detect and protect against the illegitimate traffic. When the rogue
+node is not on path, it is expected that it is unlikely to receives
+responses back. Even though this limits the scope of attacks, the
+surface for such attacks remains large. For example, an attacker may
+target a specific TS or application by crafting a specific packet that
+can either generates load on the system or crash the system or
+application. TCP syn flood attack typically overload the TS. Note that
+udp application are privileged target as they do not require the
+establishment of a session and are expected to treat any incoming
+packets. </t>
+
+<t>Traffic injection may also be used to flood the virtual network to
+disrupt the communications between the TS or to introduce additional
+cost for the tenant, for example when pricing considers the traffic
+inside the virtual network.  The two latest attacks may also take
+advantage of applications with a large factor of amplification for their
+responses as well as applications that upon receiving a packet interact
+with multiple TS.  Similarly, applications running on top of UDP are
+privileged targets.</t>
+
+<t>Note also that even if the attacker may not be able to receive the
+response traffic, the attacker may use other channels to evaluate or
+measure the impact of the attack. Typically, in the case of a service,
+the attacker may have access, for example, to a user interface that
+provides indication on the level of disruption and the success of an
+attack, Such feed backs may also be used by the attacker to discover or
+scan the network.</t>
+
+<t>A rogue element of the overlay Geneve network under the control of an
+attacker may leak and redirect the traffic from a virtual network to the
+attacker for passive monitoring <xref target="RFC7258"/>, or for
+actively re-injecting a modified Geneve packet into the overlay.</t>
+
+<t>Avoiding leaking information is hard to enforced and the security
+requirements expect to mitigate such attacks by lowering the
+consequences, typically making leaked data unusable to an
+attacker..</t>
+
+<t>Preventing traffic to cross virtual networks, reduce the surface of
+attack. but  rogue NVO3 element main still perform attacks within a
+given virtual network by replaying a legitimate packet. Some variant of
+such attack also includes modification of unprotected parts when
+available in order for example to increase the payload size.</t>
+
+<t>In the next section we will provide security mitigations
+against such attacks.</t>
+
+</section>
+
+<section title="Requirements for Security mitigations">
+
+<t>The document assumes that Security protocols, algorithms, and
+implementations provide the security properties for which they are
+designed, an attack caused by a weakness in a cryptographic algorithm is
+out of scope.</t>
+
+<t>Protecting network connecting TSes and NVEs which could be accessible
+to outside attackers is out of scope.</t>
+
+<t>An attacker controlling an underlying network device may break the
+communication of the overlays by discarding or delaying the delivery of
+the packets passing through it. The security consideration to prevent
+this type of attack is out of scope of this document.</t>
+
+<t>Securing communication between NVAs and NVEs is out of scope.</t>
+
+<t>Selectively providing integrity/authentication,
+confidentiality/encryption of only portions of the Geneve packet is in
+scope. This will be the case if the Tenant Systems uses security
+protocol to protect its communications.</t>
+
+<section title="Protecting against traffic injection">
+
+<t>Traffic injection from a rogue non legitimate NVO3 Geneve overlay
+device or a rogue underlay transit device can target an NVE, a transit
+underlay device or a Tenant System.  Targeting a Tenant's System
+requires a valid MAC and IP addresses of the Tenant's System.</t>
+
+<t>Tenant's System may protect their communications using IPsec or TLS.
+Such protection protects the Tenants from receiving spoofed packets, as
+any injected packet is expected to be discarded by the destination
+Tenant's System.  Such protection does not protect the tenant system
+from receiving illegitimate packets that may disrupt the Tenant's System
+performance.</t>
+
+<t>The Geneve overlay network MAY still need to prevent such spoofed
+Tenant's system packets from being steered to the Tenant's system.</t>
+
+<t>When the Tenant's System are not protecting their communications, the
+Geneve overlay network SHOULD be able to to prevent a rogue device from
+injecting traffic into the overlay network.</t>
+
+<t>In order to prevent traffic injection to one virtual network, the
+destination legitimate Geneve NVE MUST be able to authenticate the
+incoming Geneve packets from the source NVE. Authenticated Geneve Packet
+MAY be checked by underlay intermediary nodes.</t>
+
+<t>This leads to the following security requirements:
+
+<list style="format REQ%d:" counter="my_count">
+
+<t>A Geneve NVE MUST be able to authenticate the Geneve tunnel Header,
+and/or the Geneve base header, and/or the immutable Geneve Options,
+and/or the Geneve payload.</t>
+
+<t>A Geneve NVE MAY be able to authenticate only a portion of the Geneve
+payload if the Tenant's system is protecting it's communication.</t>
+
+<t>A transit underlay intermediary node MAY be able to validate the
+authentication before the packet reaches the Geneve destination NVE.</t>
+
+<t>A transit underlay intermediary node MUST be able to insert an
+authenticated Geneve Option into a authenticated Geneve Packet -
+protected by the source Geneve NVE.</t>
+
+<t>A transit underlay intermediary node MUST be capable of forwarding
+the Geneve authenticated packet as an non-authenticated Geneve
+Packet.</t>
+
+<t>A Geneve NVE SHOULD be able to set different security policies for
+different flows. These flows MUST be identified from the Geneve Header
+and/or Geneve Options as well as some inner traffic selectors.</t>  
+
+<t>In the case when Tenant systems secure their communications using
+protocols such as TLS or IPSec. A Geneve NVE MAY be able to selectively
+encrypt and/or authenticate only the sections that are not
+encrypted/authenticated by the Tenant System. For example, only the IP,
+transport (TCP / UDP) in case of TLS/DTLS MAY be
+encrypted/authenticated, while only the IP header and ESP header MAY be
+encrypted/authenticated.</t>
+
+</list></t>
+
+</section>
+
+<section title="Protecting against Traffic Redirection">
+
+<t>A rogue device of the NVO3 overlay Geneve network or the underlay
+network may leak and redirect the traffic from a virtual network to the
+attacker for passive monitoring, or for actively re-injecting a modified
+Geneve Packet into the overlay.</t>
+
+<t>Re-injection through transit underlay nodes could be prevented by
+authentication.</t>
+
+<t>To prevent an attacker located in the middle between the NVEs and
+modifying the tunnel address information in the data packet header to
+redirect the data traffic, the solution need to provide confidentiality
+protection for data traffics exchanged between NVEs.</t>
+
+<t>This leads to the following security requirements:
+
+<list style="format REQ%d:" counter="my_count">
+
+<t>A Geneve NVE MUST be able encrypt Geneve base Header, and/or
+Geneve Payload and/or Geneve Options not intended for the intermediary
+Geneve nodes.</t>
+
+<t>A Geneve NVE MAY be able encrypt portion of Geneve Payload as well as
+as Geneve Options not intended for the intermediary Geneve nodes.</t>
+
+<t>A transit underlay intermediary node MUST be able to insert an
+encrypted Geneve Option into an encrypted/authenticated Geneve Packet -
+protected by the source Geneve NVE.</t>
+
+<t>A Geneve NVE SHOULD be able to assign different cryptographic
+keys to protect the unicast tunnels between NVEs respectively.</t>
+
+<t>If there are multicast packets, a Geneve NVE SHOULD be able to assign
+distinct cryptographic group keys to protect the multicast packets
+exchanged among the NVEs within different multicast groups. Upon
+receiving a data packet, an egress Geneve NVE MUST be able to verify
+whether the packet is sent from a proper ingress NVE which is authorized
+to forward that packet.</t>
+
+</list></t>
+
+</section>
+
+<section title="Protecting against Traffic replay">
+
+<t>A rogue device of the NVO3 overlay Geneve network or the underlay
+network may replay a Geneve packet, to load the network and/or a
+specific Tenant System with a modified Geneve payload. In some cases,
+such attacks may target an increase of the tenants costs.</t>
+
+<t>When traffic between tenants is not protected, the rogue device may
+forward the modified packet over a valid Geneve Header. The crafted
+packet may for example, include a specifically crafted application
+payload for a specific Tenant Systems application, with the intention to
+load the tenant specific application.</t>
+
+<t>Updating the Geneve header and option parameters such as setting an OAM
+bit, adding bogus option TLVs, or setting a critical bit, may result in
+different processing behavior, that could greatly impact performance of
+the overlay network and the underlay infrastructure and thus affect the
+tenants traffic delivery.</t>
+
+<t>The NVO3 overlay network and underlay network nodes that may address
+such attacks MUST provide means to authenticate the Geneve packet
+components.</t> 
+
+<t>This leads to the following security requirements:
+
+<list style="format REQ%d:" counter="my_count">
+
+<t>A Geneve NVE or a transit intermediary underlay node SHOULD be
+able to validate the Geneve Header corresponds to the Geneve payload,
+and discard such packets.</t>
+
+<t>A Geneve NVE or a transit intermediary underlay node SHOULD
+provide anti replay mechanisms and discarded replayed packet.</t>
+
+</list></t>
+
+</section>
+
+</section>
+    
+<section title="IANA Considerations">
+      
+<t>There are no IANA consideration for this document.</t>
+    
+</section>
+    
+<section anchor="sec-considerations" title="Security Considerations">
+      
+<t>The whole document is about security.</t>
+
+<t>Limiting the coverage of the authentication / encryption provides
+some means for an attack to craft special packets.</t>
+
+
+    </section>
+    <section title="Acknowledgment"/>
+  </middle>
+  <back>
+    <references title="Normative References">
+
+<?rfc include="reference.RFC.2119.xml"?>
+<?rfc include="reference.RFC.4301.xml"?>
+<?rfc include="reference.RFC.5246.xml"?>
+<?rfc include="reference.I-D.ietf-nvo3-geneve"?>
+
+    </references>
+
+    <references title="Informational References">
+
+<?rfc include="reference.RFC.8014.xml"?>
+<?rfc include="reference.RFC.7258.xml"?>
+<?rfc include="reference.RFC.7365.xml"?>
+<?rfc include="reference.I-D.ietf-nvo3-security-requirements"?>
+
+    </references>
+
+  </back>
+</rfc>
