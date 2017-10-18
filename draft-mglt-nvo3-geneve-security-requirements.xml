@@ -22,14 +22,14 @@ docName="draft-mglt-nvo3-geneve-security-requirements-01" ipr="trust200902">
     </author>
 
     <author surname="Boutros" initials="S.B." fullname="Sami Boutros">
-      <organization>VMware, Inc</organization>
+      <organization abbrev="VMware">VMware, Inc.</organization>
       <address>
         <email>sboutros@vmware.com</email>
       </address>
     </author>
 
     <author surname="Wing" initials="D.W." fullname="Dan Wing">
-      <organization>VMware, Inc</organization>
+      <organization abbrev="VMware">VMware, Inc.</organization>
       <address>
         <email>dwing@vmware.com</email>
       </address>
