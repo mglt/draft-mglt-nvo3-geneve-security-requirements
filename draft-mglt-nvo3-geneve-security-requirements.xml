@@ -56,12 +56,14 @@ Generic Network Virtualization Encapsulation (Geneve). </t>
     </abstract>
   </front>
   <middle>
-    <section title="Requirements notation">
+    <section title="Requirements Notation">
       
-<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in <xref
-target="RFC2119"/>.</t>
+    <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+      NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
+      "MAY", and "OPTIONAL" in this document are to be interpreted as
+      described BCP 14 <xref target="RFC2119"/>
+      <xref target="RFC8174"/> when, and only when, they appear in all
+      capitals, as shown here.</t>
 
     </section>
     <section title="Introduction">
@@ -71,7 +73,7 @@ in <xref target="arch"/>, allows an overlay cloud provider to provide a
 logical L2/L3 interconnect for the Tenant Systems TSes that belong to a
 specific tenant network. A packet received from a tenant system is
 encapsulated by the ingress Network Virtualization Edge (NVE). The
-encapsulated packet is then sent to the remote NVE through a proper
+encapsulated packet is then sent to the remote NVE through a 
 tunnel. When reaching the egress NVE of the tunnel, the packet is
 decapsulated and forwarded to the target tenant system. The L2/L3
 address mappings to the remote NVE(s) are distributed to the NVEs by a
@@ -138,9 +140,10 @@ cloud provider the necessary options to ensure:
 
 <list style="numbers">
 
-<t>Delivering tenant payload traffic and ensuring privacy, integrity
-and isolation over the overlay and underlay networks, as well preventing
-tenant traffic from being redirected or injected to other tenants.</t>
+<t>Delivering tenant payload traffic and ensuring privacy and
+integrity of the overlay traffic, and isolation between the overlay
+and underlay networks, as well preventing tenant traffic from being
+redirected or injected to other tenants.</t>
 
 <t>Protecting tenant traffic from rogue devices in the providers of
 Geneve overlay or underlay networks.</t>
@@ -181,9 +184,35 @@ of the Geneve packets can perform their attacks by changing fields in
 the Geneve tunnel header, base header, Geneve options and Geneve packet
 inner payload. </t>
 
-<t>Typical threats include traffic injection, traffic redirection,
-traffic replay. Based on these threats, this document derive the
+<t>Threats include traffic analysis, sniffing, injection, redirection,
+and replay.  Based on these threats, this document enumerates the
 security requirements.</t>
+
+<t>Threats are divided into two categories:  passive attack and
+active attack.</t>
+
+<section title="Passive Attacks">
+<t>Passive attacks include traffic analysis (noticing
+which workloads are communicating with which other workloads, how much
+traffic, and when those communications occur) and sniffing (examining
+traffic for useful information such as personally-identifyable 
+information or protocol information (e.g., TLS certificate, overlay
+routing protocols).</t>
+
+<t>A rogue element of the overlay Geneve network under the control of an
+attacker may leak and redirect the traffic from a virtual network to the
+attacker for passive monitoring <xref target="RFC7258"/>.</t>
+
+<t>Avoiding leaking information is hard to enforced and the security
+requirements expect to mitigate such attacks by lowering the
+consequences, typically making leaked data unusable to an
+attacker..</t>
+</section>
+
+<section title="Active Attacks">
+<t>Active attacks involve modifying packets,
+injecting packets, or interfering with packet delivery (such as by
+corrupting packet checksum).</t>
 
 <t>There are multiple motivations to inject illegitimate traffic in to a
 tenants network. When the rogue node is the path of the TS traffic, the
@@ -221,28 +250,16 @@ provides indication on the level of disruption and the success of an
 attack, Such feed backs may also be used by the attacker to discover or
 scan the network.</t>
 
-<t>A rogue element of the overlay Geneve network under the control of an
-attacker may leak and redirect the traffic from a virtual network to the
-attacker for passive monitoring <xref target="RFC7258"/>, or for
-actively re-injecting a modified Geneve packet into the overlay.</t>
-
-<t>Avoiding leaking information is hard to enforced and the security
-requirements expect to mitigate such attacks by lowering the
-consequences, typically making leaked data unusable to an
-attacker..</t>
-
 <t>Preventing traffic to cross virtual networks, reduce the surface of
-attack. but  rogue NVO3 element main still perform attacks within a
+attack, but rogue NVO3 element main still perform attacks within a
 given virtual network by replaying a legitimate packet. Some variant of
 such attack also includes modification of unprotected parts when
 available in order for example to increase the payload size.</t>
-
-<t>In the next section we will provide security mitigations
-against such attacks.</t>
+</section>
 
 </section>
 
-<section title="Requirements for Security mitigations">
+<section title="Requirements for Security Mitigations">
 
 <t>The document assumes that Security protocols, algorithms, and
 implementations provide the security properties for which they are
@@ -264,7 +281,37 @@ confidentiality/encryption of only portions of the Geneve packet is in
 scope. This will be the case if the Tenant Systems uses security
 protocol to protect its communications.</t>
 
-<section title="Protecting against traffic injection">
+<section title="Protection Against Traffic Sniffing">
+<t>A passive network observer can determine two virtual machines are
+communicating by manipulating activity or network activity of other
+virtual machines on that same host.  For example, the attacker could
+control (or be otherwise aware of) network activity of the other VMs
+running on the same host, and deduce other network activity is due to
+a victim VM.  Comparing application TLS to guest IPsec ESP to NVE
+IPsec ESP, each provides stronger protection from traffic analysis in
+the same order.  Application TLS exposes TCP port numbers to a passive
+observer, guest IPsec ESP encrypts the inner transport header but
+still identifies the communicating VM's IP address, while NVE IPsec
+ESP encrypts the entire inner payload.</t>
+
+<t>To protect packet payloads from passive listeners, application-level
+encryption (e.g., <xref target="RFC7516">JSON Web Encryption</xref>),
+application TLS, guest IPsec ESP, or hypervisor IPsec ESP can be used.  Each
+provides the same protection against a passive listener.</t>
+
+<t>To protect against the above-described traffic sniffing attacks, we
+require:
+<list style="format REQ%d:" counter="my_count">
+<t>The NVE MUST ensure the traffic leaving the NVE has its payload
+encrypted.</t>
+<t>The NVE MUST encrypt traffic that was not already
+encrypted by the application.</t>
+<t>To provide best protection from traffic analysis, the NVE SHOULD
+encrypt the VM's inner IP address, transport header, and payload.</t>
+</list></t>
+</section>
+
+<section title="Protecting Against Traffic Injection">
 
 <t>Traffic injection from a rogue non legitimate NVO3 Geneve overlay
 device or a rogue underlay transit device can target an NVE, a transit
@@ -299,7 +346,7 @@ and/or the Geneve base header, and/or the immutable Geneve Options,
 and/or the Geneve payload.</t>
 
 <t>A Geneve NVE MAY be able to authenticate only a portion of the Geneve
-payload if the Tenant's system is protecting it's communication.</t>
+payload if the Tenant's system is protecting its communication.</t>
 
 <t>A transit underlay intermediary node MAY be able to validate the
 authentication before the packet reaches the Geneve destination NVE.</t>
@@ -328,7 +375,7 @@ encrypted/authenticated.</t>
 
 </section>
 
-<section title="Protecting against Traffic Redirection">
+<section title="Protecting Against Traffic Redirection">
 
 <t>A rogue device of the NVO3 overlay Geneve network or the underlay
 network may leak and redirect the traffic from a virtual network to the
@@ -372,7 +419,7 @@ to forward that packet.</t>
 
 </section>
 
-<section title="Protecting against Traffic replay">
+<section title="Protecting Against Traffic Replay">
 
 <t>A rogue device of the NVO3 overlay Geneve network or the underlay
 network may replay a Geneve packet, to load the network and/or a
@@ -427,12 +474,18 @@ some means for an attack to craft special packets.</t>
 
 
     </section>
-    <section title="Acknowledgment"/>
+
+<!--
+    <section title="Acknowledgments">
+    <t></t>
+-->
+
   </middle>
   <back>
     <references title="Normative References">
 
 <?rfc include="reference.RFC.2119.xml"?>
+<?rfc include="reference.RFC.8174.xml"?>
 <?rfc include="reference.RFC.4301.xml"?>
 <?rfc include="reference.RFC.5246.xml"?>
 <?rfc include="reference.I-D.ietf-nvo3-geneve"?>
@@ -444,6 +497,7 @@ some means for an attack to craft special packets.</t>
 <?rfc include="reference.RFC.8014.xml"?>
 <?rfc include="reference.RFC.7258.xml"?>
 <?rfc include="reference.RFC.7365.xml"?>
+<?rfc include="reference.RFC.7516.xml"?>
 <?rfc include="reference.I-D.ietf-nvo3-security-requirements"?>
 
     </references>
