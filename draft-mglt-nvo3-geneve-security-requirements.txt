@@ -6,7 +6,7 @@ NVO3                                                          D. Migault
 Internet-Draft                                                  Ericsson
 Intended status: Informational                                S. Boutros
 Expires: April 21, 2018                                          D. Wing
-                                                             VMware, Inc
+                                                                  VMware
                                                              S. Krishnan
                                                                   Kaloom
                                                         October 18, 2017
