@@ -304,8 +304,6 @@ require:
 <list style="format REQ%d:" counter="my_count">
 <t>The NVE MUST ensure the traffic leaving the NVE has its payload
 encrypted.</t>
-<t>The NVE MUST encrypt traffic that was not already
-encrypted by the application.</t>
 <t>To provide best protection from traffic analysis, the NVE SHOULD
 encrypt the VM's inner IP address, transport header, and payload.</t>
 </list></t>

@@ -5,11 +5,11 @@
 NVO3                                                          D. Migault
 Internet-Draft                                                  Ericsson
 Intended status: Informational                                S. Boutros
-Expires: April 21, 2018                                          D. Wing
+Expires: April 25, 2018                                          D. Wing
                                                                   VMware
                                                              S. Krishnan
                                                                   Kaloom
-                                                        October 18, 2017
+                                                        October 22, 2017
 
 
                  Geneve Protocol Security Requirements
@@ -37,7 +37,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 21, 2018.
+   This Internet-Draft will expire on April 25, 2018.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Migault, et al.          Expires April 21, 2018                 [Page 1]
+Migault, et al.          Expires April 25, 2018                 [Page 1]
 
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Migault, et al.          Expires April 21, 2018                 [Page 2]
+Migault, et al.          Expires April 25, 2018                 [Page 2]
 
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
@@ -165,7 +165,7 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
 
 
-Migault, et al.          Expires April 21, 2018                 [Page 3]
+Migault, et al.          Expires April 25, 2018                 [Page 3]
 
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
@@ -221,7 +221,7 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
 
 
-Migault, et al.          Expires April 21, 2018                 [Page 4]
+Migault, et al.          Expires April 25, 2018                 [Page 4]
 
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
@@ -277,7 +277,7 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
 
 
-Migault, et al.          Expires April 21, 2018                 [Page 5]
+Migault, et al.          Expires April 25, 2018                 [Page 5]
 
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
@@ -333,7 +333,7 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
 
 
-Migault, et al.          Expires April 21, 2018                 [Page 6]
+Migault, et al.          Expires April 25, 2018                 [Page 6]
 
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
@@ -357,10 +357,7 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
    REQ1:  The NVE MUST ensure the traffic leaving the NVE has its
           payload encrypted.
 
-   REQ2:  The NVE MUST encrypt traffic that was not already encrypted by
-          the application.
-
-   REQ3:  To provide best protection from traffic analysis, the NVE
+   REQ2:  To provide best protection from traffic analysis, the NVE
           SHOULD encrypt the VM's inner IP address, transport header,
           and payload.
 
@@ -385,48 +382,46 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
    Geneve overlay network SHOULD be able to to prevent a rogue device
    from injecting traffic into the overlay network.
 
-
-
-
-
-Migault, et al.          Expires April 21, 2018                 [Page 7]
-
-Internet-Draft    Geneve Protocol Security Requirements     October 2017
-
-
    In order to prevent traffic injection to one virtual network, the
    destination legitimate Geneve NVE MUST be able to authenticate the
    incoming Geneve packets from the source NVE.  Authenticated Geneve
    Packet MAY be checked by underlay intermediary nodes.
 
+
+
+Migault, et al.          Expires April 25, 2018                 [Page 7]
+
+Internet-Draft    Geneve Protocol Security Requirements     October 2017
+
+
    This leads to the following security requirements:
 
-   REQ4:  A Geneve NVE MUST be able to authenticate the Geneve tunnel
+   REQ3:  A Geneve NVE MUST be able to authenticate the Geneve tunnel
           Header, and/or the Geneve base header, and/or the immutable
           Geneve Options, and/or the Geneve payload.
 
-   REQ5:  A Geneve NVE MAY be able to authenticate only a portion of the
+   REQ4:  A Geneve NVE MAY be able to authenticate only a portion of the
           Geneve payload if the Tenant's system is protecting its
           communication.
 
-   REQ6:  A transit underlay intermediary node MAY be able to validate
+   REQ5:  A transit underlay intermediary node MAY be able to validate
           the authentication before the packet reaches the Geneve
           destination NVE.
 
-   REQ7:  A transit underlay intermediary node MUST be able to insert an
+   REQ6:  A transit underlay intermediary node MUST be able to insert an
           authenticated Geneve Option into a authenticated Geneve Packet
           - protected by the source Geneve NVE.
 
-   REQ8:  A transit underlay intermediary node MUST be capable of
+   REQ7:  A transit underlay intermediary node MUST be capable of
           forwarding the Geneve authenticated packet as an non-
           authenticated Geneve Packet.
 
-   REQ9:  A Geneve NVE SHOULD be able to set different security policies
+   REQ8:  A Geneve NVE SHOULD be able to set different security policies
           for different flows.  These flows MUST be identified from the
           Geneve Header and/or Geneve Options as well as some inner
           traffic selectors.
 
-   REQ10: In the case when Tenant systems secure their communications
+   REQ9:  In the case when Tenant systems secure their communications
           using protocols such as TLS or IPSec.  A Geneve NVE MAY be
           able to selectively encrypt and/or authenticate only the
           sections that are not encrypted/authenticated by the Tenant
@@ -441,41 +436,41 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
    the attacker for passive monitoring, or for actively re-injecting a
    modified Geneve Packet into the overlay.
 
-
-
-
-
-Migault, et al.          Expires April 21, 2018                 [Page 8]
-
-Internet-Draft    Geneve Protocol Security Requirements     October 2017
-
-
    Re-injection through transit underlay nodes could be prevented by
    authentication.
 
    To prevent an attacker located in the middle between the NVEs and
    modifying the tunnel address information in the data packet header to
+
+
+
+
+Migault, et al.          Expires April 25, 2018                 [Page 8]
+
+Internet-Draft    Geneve Protocol Security Requirements     October 2017
+
+
    redirect the data traffic, the solution need to provide
    confidentiality protection for data traffics exchanged between NVEs.
 
    This leads to the following security requirements:
 
-   REQ11: A Geneve NVE MUST be able encrypt Geneve base Header, and/or
+   REQ10: A Geneve NVE MUST be able encrypt Geneve base Header, and/or
           Geneve Payload and/or Geneve Options not intended for the
           intermediary Geneve nodes.
 
-   REQ12: A Geneve NVE MAY be able encrypt portion of Geneve Payload as
+   REQ11: A Geneve NVE MAY be able encrypt portion of Geneve Payload as
           well as as Geneve Options not intended for the intermediary
           Geneve nodes.
 
-   REQ13: A transit underlay intermediary node MUST be able to insert an
+   REQ12: A transit underlay intermediary node MUST be able to insert an
           encrypted Geneve Option into an encrypted/authenticated Geneve
           Packet - protected by the source Geneve NVE.
 
-   REQ14: A Geneve NVE SHOULD be able to assign different cryptographic
+   REQ13: A Geneve NVE SHOULD be able to assign different cryptographic
           keys to protect the unicast tunnels between NVEs respectively.
 
-   REQ15: If there are multicast packets, a Geneve NVE SHOULD be able to
+   REQ14: If there are multicast packets, a Geneve NVE SHOULD be able to
           assign distinct cryptographic group keys to protect the
           multicast packets exchanged among the NVEs within different
           multicast groups.  Upon receiving a data packet, an egress
@@ -498,17 +493,18 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
    Updating the Geneve header and option parameters such as setting an
    OAM bit, adding bogus option TLVs, or setting a critical bit, may
-
-
-
-Migault, et al.          Expires April 21, 2018                 [Page 9]
-
-Internet-Draft    Geneve Protocol Security Requirements     October 2017
-
-
    result in different processing behavior, that could greatly impact
    performance of the overlay network and the underlay infrastructure
    and thus affect the tenants traffic delivery.
+
+
+
+
+
+Migault, et al.          Expires April 25, 2018                 [Page 9]
+
+Internet-Draft    Geneve Protocol Security Requirements     October 2017
+
 
    The NVO3 overlay network and underlay network nodes that may address
    such attacks MUST provide means to authenticate the Geneve packet
@@ -516,11 +512,11 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
    This leads to the following security requirements:
 
-   REQ16: A Geneve NVE or a transit intermediary underlay node SHOULD be
+   REQ15: A Geneve NVE or a transit intermediary underlay node SHOULD be
           able to validate the Geneve Header corresponds to the Geneve
           payload, and discard such packets.
 
-   REQ17: A Geneve NVE or a transit intermediary underlay node SHOULD
+   REQ16: A Geneve NVE or a transit intermediary underlay node SHOULD
           provide anti replay mechanisms and discarded replayed packet.
 
 6.  IANA Considerations
@@ -552,20 +548,19 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
               Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
               December 2005, <https://www.rfc-editor.org/info/rfc4301>.
 
-
-
-
-
-
-Migault, et al.          Expires April 21, 2018                [Page 10]
-
-Internet-Draft    Geneve Protocol Security Requirements     October 2017
-
-
    [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
               (TLS) Protocol Version 1.2", RFC 5246,
               DOI 10.17487/RFC5246, August 2008,
               <https://www.rfc-editor.org/info/rfc5246>.
+
+
+
+
+
+Migault, et al.          Expires April 25, 2018                [Page 10]
+
+Internet-Draft    Geneve Protocol Security Requirements     October 2017
+
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -608,24 +603,23 @@ Authors' Addresses
    Email: daniel.migault@ericsson.com
 
 
-
-
-
-
-
-Migault, et al.          Expires April 21, 2018                [Page 11]
-
-Internet-Draft    Geneve Protocol Security Requirements     October 2017
-
-
    Sami Boutros
-   VMware, Inc
+   VMware, Inc.
 
    Email: sboutros@vmware.com
 
 
+
+
+
+
+Migault, et al.          Expires April 25, 2018                [Page 11]
+
+Internet-Draft    Geneve Protocol Security Requirements     October 2017
+
+
    Dan Wing
-   VMware, Inc
+   VMware, Inc.
 
    Email: dwing@vmware.com
 
@@ -669,4 +663,10 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
 
 
-Migault, et al.          Expires April 21, 2018                [Page 12]
+
+
+
+
+
+
+Migault, et al.          Expires April 25, 2018                [Page 12]
