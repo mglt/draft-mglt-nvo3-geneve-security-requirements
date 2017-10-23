@@ -404,16 +404,16 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
           Geneve payload if the Tenant's system is protecting its
           communication.
 
-   REQ5:  A transit underlay intermediary node MAY be able to validate
-          the authentication before the packet reaches the Geneve
-          destination NVE.
+   REQ5:  A Virtual Network Instance intermediary node MAY be able to
+          validate the authentication before the packet reaches the
+          Geneve destination NVE.
 
-   REQ6:  A transit underlay intermediary node MUST be able to insert an
-          authenticated Geneve Option into a authenticated Geneve Packet
-          - protected by the source Geneve NVE.
+   REQ6:  A Virtual Network Instance intermediary node MUST be able to
+          insert an authenticated Geneve Option into a authenticated
+          Geneve Packet - protected by the source Geneve NVE.
 
-   REQ7:  A transit underlay intermediary node MUST be capable of
-          forwarding the Geneve authenticated packet as an non-
+   REQ7:  A Virtual Network Instance intermediary node MUST be capable
+          of forwarding the Geneve authenticated packet as an non-
           authenticated Geneve Packet.
 
    REQ8:  A Geneve NVE SHOULD be able to set different security policies
@@ -432,15 +432,15 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
 5.3.  Protecting Against Traffic Redirection
 
    A rogue device of the NVO3 overlay Geneve network or the underlay
-   network may leak and redirect the traffic from a virtual network to
-   the attacker for passive monitoring, or for actively re-injecting a
-   modified Geneve Packet into the overlay.
-
-   Re-injection through transit underlay nodes could be prevented by
-   authentication.
+   network may redirect the traffic from a virtual network to the
+   attacker for passive or active attacks.
 
    To prevent an attacker located in the middle between the NVEs and
    modifying the tunnel address information in the data packet header to
+   redirect the data traffic, the solution need to provide
+   confidentiality protection for data traffics exchanged between NVEs.
+
+   This leads to the following security requirements:
 
 
 
@@ -449,11 +449,6 @@ Migault, et al.          Expires April 25, 2018                 [Page 8]
 
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
-
-   redirect the data traffic, the solution need to provide
-   confidentiality protection for data traffics exchanged between NVEs.
-
-   This leads to the following security requirements:
 
    REQ10: A Geneve NVE MUST be able encrypt Geneve base Header, and/or
           Geneve Payload and/or Geneve Options not intended for the
@@ -497,6 +492,11 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
    performance of the overlay network and the underlay infrastructure
    and thus affect the tenants traffic delivery.
 
+   The NVO3 overlay network and underlay network nodes that may address
+   such attacks MUST provide means to authenticate the Geneve packet
+   components.
+
+   This leads to the following security requirements:
 
 
 
@@ -505,12 +505,6 @@ Migault, et al.          Expires April 25, 2018                 [Page 9]
 
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
-
-   The NVO3 overlay network and underlay network nodes that may address
-   such attacks MUST provide means to authenticate the Geneve packet
-   components.
-
-   This leads to the following security requirements:
 
    REQ15: A Geneve NVE or a transit intermediary underlay node SHOULD be
           able to validate the Geneve Header corresponds to the Geneve
@@ -553,6 +547,12 @@ Internet-Draft    Geneve Protocol Security Requirements     October 2017
               DOI 10.17487/RFC5246, August 2008,
               <https://www.rfc-editor.org/info/rfc5246>.
 
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+
+
 
 
 
@@ -561,10 +561,6 @@ Migault, et al.          Expires April 25, 2018                [Page 10]
 
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
-
-   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
-              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
 8.2.  Informational References
 
@@ -609,6 +605,10 @@ Authors' Addresses
    Email: sboutros@vmware.com
 
 
+   Dan Wing
+   VMware, Inc.
+
+   Email: dwing@vmware.com
 
 
 
@@ -618,16 +618,16 @@ Migault, et al.          Expires April 25, 2018                [Page 11]
 Internet-Draft    Geneve Protocol Security Requirements     October 2017
 
 
-   Dan Wing
-   VMware, Inc.
-
-   Email: dwing@vmware.com
-
-
    Suresh Krishna
    Kaloom
 
    Email: suresh@kaloom.com
+
+
+
+
+
+
 
 
 

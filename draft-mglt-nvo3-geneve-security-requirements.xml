@@ -346,14 +346,14 @@ and/or the Geneve payload.</t>
 <t>A Geneve NVE MAY be able to authenticate only a portion of the Geneve
 payload if the Tenant's system is protecting its communication.</t>
 
-<t>A transit underlay intermediary node MAY be able to validate the
+<t>A Virtual Network Instance intermediary node MAY be able to validate the
 authentication before the packet reaches the Geneve destination NVE.</t>
 
-<t>A transit underlay intermediary node MUST be able to insert an
+<t>A Virtual Network Instance intermediary node MUST be able to insert an
 authenticated Geneve Option into a authenticated Geneve Packet -
 protected by the source Geneve NVE.</t>
 
-<t>A transit underlay intermediary node MUST be capable of forwarding
+<t>A Virtual Network Instance intermediary node MUST be capable of forwarding
 the Geneve authenticated packet as an non-authenticated Geneve
 Packet.</t>
 
@@ -376,12 +376,8 @@ encrypted/authenticated.</t>
 <section title="Protecting Against Traffic Redirection">
 
 <t>A rogue device of the NVO3 overlay Geneve network or the underlay
-network may leak and redirect the traffic from a virtual network to the
-attacker for passive monitoring, or for actively re-injecting a modified
-Geneve Packet into the overlay.</t>
-
-<t>Re-injection through transit underlay nodes could be prevented by
-authentication.</t>
+network may redirect the traffic from a virtual network to the
+attacker for passive or active attacks.</t>
 
 <t>To prevent an attacker located in the middle between the NVEs and
 modifying the tunnel address information in the data packet header to
