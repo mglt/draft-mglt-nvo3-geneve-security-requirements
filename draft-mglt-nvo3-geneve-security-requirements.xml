@@ -71,16 +71,18 @@ Generic Network Virtualization Encapsulation (Geneve). </t>
 <t>The network virtualization overlay over Layer 3 (NVO3)  as depicted
 in <xref target="arch"/>, allows an overlay cloud provider to provide a
 logical L2/L3 interconnect for the Tenant Systems TSes that belong to a
-specific tenant network. A packet received from a tenant system is
+specific tenant network. A packet received from a TS is
 encapsulated by the ingress Network Virtualization Edge (NVE). The
 encapsulated packet is then sent to the remote NVE through a 
 tunnel. When reaching the egress NVE of the tunnel, the packet is
-decapsulated and forwarded to the target tenant system. The L2/L3
+decapsulated and forwarded to the target TS. The L2/L3
 address mappings to the remote NVE(s) are distributed to the NVEs by a
 logically centralized Network Virtualization Authority (NVA) or using a
-distributed control plane such as Ethernet-VPN.  In a datacenter, the
+distributed control plane such as Ethernet-VPN. In a datacenter, the
 NVO3 tunnels can be implemented using Generic Network Virtualization
-Encapsulation (Geneve) <xref target="I-D.ietf-nvo3-geneve"/>.  The
+Encapsulation (Geneve) <xref target="I-D.ietf-nvo3-geneve"/>. Such
+Geneve tunnels establish NVE-to-NVE communications, may transit within
+the data center via Geneve Transit Nodes (GTN). The
 Geneve tunnels overlay network enable multiple Virtual Networks to
 coexist over a shared underlay infrastructure, and a Virtual Network may
 span a single data center or multiple data centers.</t>  
@@ -126,14 +128,16 @@ requirements that needs to be fulfilled. In addition, this document
 lists the requirements to protect the Geneve packet components defined
 in <xref target="I-D.ietf-nvo3-geneve"/> that include the Geneve tunnel IP and UDP
 header, the Geneve Header, Geneve options, and inner payload. Protecting
-the complete Geneve packet is out of scope of this document, given that
+the complete Geneve packet - that is the full IP packet or the full
+outer UDP
+payload  for example - is out of scope of this document, given that
 this can be supported using existing mechanisms.</t> 
 
 <t>This document assumes that a tenant subscribes to an overlay cloud
 provider for hosting its Tenant Systems, the cloud provider manages the
-Geneve overlay network on behalf of the tenant.  The overlay network
+Geneve overlay network on behalf of the tenant. The overlay network
 will be hosted on an underlay network infrastructure, that may be
-managed by another underlay network provider.</t>
+managed by another underlay cloud provider.</t>
 
 <t>The security requirements in this document aims at providing the overlay
 cloud provider the necessary options to ensure:
@@ -185,7 +189,7 @@ the Geneve tunnel header, base header, Geneve options and Geneve packet
 inner payload. </t>
 
 <t>Threats include traffic analysis, sniffing, injection, redirection,
-and replay.  Based on these threats, this document enumerates the
+and replay. Based on these threats, this document enumerates the
 security requirements.</t>
 
 <t>Threats are divided into two categories:  passive attack and
@@ -210,28 +214,28 @@ attacker..</t>
 </section>
 
 <section title="Active Attacks">
-<t>Active attacks involve modifying packets,
-injecting packets, or interfering with packet delivery (such as by
-corrupting packet checksum).</t>
 
-<t>There are multiple motivations to inject illegitimate traffic in to a
-tenants network. When the rogue node is the path of the TS traffic, the
-rogue node may be able to inject and receive the corresponding messages
+<t>Active attacks involve modifying packets, injecting packets, or
+interfering with packet delivery (such as by corrupting packet
+checksum).</t>
+
+<t>There are multiple motivations to inject illegitimate traffic into a
+tenants network. When the rogue element is on the path of the TS
+traffic, it may be able to inject and receive the corresponding messages
 back. On the other hand, if the attacker is not on the path of the TS
 traffic it may be limited to only inject traffic to a TS without
-receiving any response back. When rogue nodes has access to the traffic
-in both directions, the possibilities are limited only limited by the
-capabilities of the other on path elements - NVO3 elements, NVE or TS -
-to detect and protect against the illegitimate traffic. When the rogue
-node is not on path, it is expected that it is unlikely to receives
-responses back. Even though this limits the scope of attacks, the
-surface for such attacks remains large. For example, an attacker may
-target a specific TS or application by crafting a specific packet that
-can either generates load on the system or crash the system or
-application. TCP syn flood attack typically overload the TS. Note that
-udp application are privileged target as they do not require the
-establishment of a session and are expected to treat any incoming
-packets. </t>
+receiving any response back.  When rogue element have access to the
+traffic in both directions, the possibilities are only limited by the
+capabilities of the other on path elements - GTN, NVE or TS - to detect
+and protect against the illegitimate traffic. On the other hand, when
+the rogue element is not on path, the surface for such attacks remains
+still quite large. For example, an attacker may target a specific TS or
+application by crafting a specific packet that can either generate load
+on the system or crash the system or application. TCP syn flood
+typically overload the TS while not requiring the ability to receive
+responses. Note that udp application are privileged target as they do
+not require the establishment of a session and are expected to treat any
+incoming packets. </t>
 
 <t>Traffic injection may also be used to flood the virtual network to
 disrupt the communications between the TS or to introduce additional
@@ -239,22 +243,22 @@ cost for the tenant, for example when pricing considers the traffic
 inside the virtual network.  The two latest attacks may also take
 advantage of applications with a large factor of amplification for their
 responses as well as applications that upon receiving a packet interact
-with multiple TS.  Similarly, applications running on top of UDP are
+with multiple TS. Similarly, applications running on top of UDP are
 privileged targets.</t>
 
-<t>Note also that even if the attacker may not be able to receive the
-response traffic, the attacker may use other channels to evaluate or
-measure the impact of the attack. Typically, in the case of a service,
-the attacker may have access, for example, to a user interface that
-provides indication on the level of disruption and the success of an
-attack, Such feed backs may also be used by the attacker to discover or
-scan the network.</t>
+<t>Note also that an attacker that is not able to receive the response
+traffic, may use other channels to evaluate or measure the impact of the
+attack. Typically, in the case of a service, the attacker may have
+access, for example, to a user interface that provides indication on the
+level of disruption and the success of an attack, Such feed backs may
+also be used by the attacker to discover or scan the network.</t>
 
 <t>Preventing traffic to cross virtual networks, reduce the surface of
-attack, but rogue NVO3 element main still perform attacks within a
+attack, but rogue element main still perform attacks within a
 given virtual network by replaying a legitimate packet. Some variant of
 such attack also includes modification of unprotected parts when
 available in order for example to increase the payload size.</t>
+
 </section>
 
 </section>
@@ -284,10 +288,10 @@ protocol to protect its communications.</t>
 <section title="Protection Against Traffic Sniffing">
 <t>A passive network observer can determine two virtual machines are
 communicating by manipulating activity or network activity of other
-virtual machines on that same host.  For example, the attacker could
+virtual machines on that same host. For example, the attacker could
 control (or be otherwise aware of) network activity of the other VMs
 running on the same host, and deduce other network activity is due to
-a victim VM.  Comparing application TLS to guest IPsec ESP to NVE
+a victim VM. Comparing application TLS to guest IPsec ESP to NVE
 IPsec ESP, each provides stronger protection from traffic analysis in
 the same order.  Application TLS exposes TCP port numbers to a passive
 observer, guest IPsec ESP encrypts the inner transport header but
@@ -335,6 +339,9 @@ destination legitimate Geneve NVE MUST be able to authenticate the
 incoming Geneve packets from the source NVE. Authenticated Geneve Packet
 MAY be checked by underlay intermediary nodes.</t>
 
+<t>Based on a policy partial authentication MAY be performed on Geneve
+packets if tenant's system is protecting it's communication.</t>
+
 <t>This leads to the following security requirements:
 
 <list style="format REQ%d:" counter="my_count">
@@ -346,14 +353,14 @@ and/or the Geneve payload.</t>
 <t>A Geneve NVE MAY be able to authenticate only a portion of the Geneve
 payload if the Tenant's system is protecting its communication.</t>
 
-<t>A Virtual Network Instance intermediary node MAY be able to validate the
+<t>A GTN MAY be able to validate the
 authentication before the packet reaches the Geneve destination NVE.</t>
 
-<t>A Virtual Network Instance intermediary node MUST be able to insert an
+<t>A GTN MUST be able to insert an
 authenticated Geneve Option into a authenticated Geneve Packet -
 protected by the source Geneve NVE.</t>
 
-<t>A Virtual Network Instance intermediary node MUST be capable of forwarding
+<t>A GTN MUST be capable of forwarding
 the Geneve authenticated packet as an non-authenticated Geneve
 Packet.</t>
 
@@ -384,16 +391,18 @@ modifying the tunnel address information in the data packet header to
 redirect the data traffic, the solution need to provide confidentiality
 protection for data traffics exchanged between NVEs.</t>
 
+<t>Based on a policy partial encryption MAY be performed on Geneve
+packets if tenant's system is protecting it's communication.</t>
+
 <t>This leads to the following security requirements:
 
 <list style="format REQ%d:" counter="my_count">
 
 <t>A Geneve NVE MUST be able encrypt Geneve base Header, and/or
-Geneve Payload and/or Geneve Options not intended for the intermediary
-Geneve nodes.</t>
+Geneve Payload and/or Geneve Options not intended for the GTN.</t>
 
 <t>A Geneve NVE MAY be able encrypt portion of Geneve Payload as well as
-as Geneve Options not intended for the intermediary Geneve nodes.</t>
+as Geneve Options not intended for the GTN.</t>
 
 <t>A transit underlay intermediary node MUST be able to insert an
 encrypted Geneve Option into an encrypted/authenticated Geneve Packet -
@@ -440,12 +449,11 @@ components.</t>
 
 <list style="format REQ%d:" counter="my_count">
 
-<t>A Geneve NVE or a transit intermediary underlay node SHOULD be
-able to validate the Geneve Header corresponds to the Geneve payload,
-and discard such packets.</t>
+<t>A Geneve NVE or a GTN SHOULD be able to validate the Geneve Header
+corresponds to the Geneve payload, and discard such packets.</t>
 
-<t>A Geneve NVE or a transit intermediary underlay node SHOULD
-provide anti replay mechanisms and discarded replayed packet.</t>
+<t>A Geneve NVE or a GTN SHOULD provide anti replay mechanisms and
+discard replayed packet.</t>
 
 </list></t>
 
