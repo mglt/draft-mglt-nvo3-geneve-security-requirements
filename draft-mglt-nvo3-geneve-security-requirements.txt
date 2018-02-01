@@ -5,11 +5,11 @@
 NVO3                                                          D. Migault
 Internet-Draft                                                  Ericsson
 Intended status: Informational                                S. Boutros
-Expires: August 3, 2018                                          D. Wing
+Expires: August 4, 2018                                          D. Wing
                                                                   VMware
                                                              S. Krishnan
                                                                   Kaloom
-                                                        January 30, 2018
+                                                        January 31, 2018
 
 
                  Geneve Protocol Security Requirements
@@ -37,7 +37,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 3, 2018.
+   This Internet-Draft will expire on August 4, 2018.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Migault, et al.          Expires August 3, 2018                 [Page 1]
+Migault, et al.          Expires August 4, 2018                 [Page 1]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
@@ -74,13 +74,13 @@ Table of Contents
      5.1.  Protection Against Traffic Sniffing . . . . . . . . . . .   7
      5.2.  Protecting Against Traffic Injection  . . . . . . . . . .   7
      5.3.  Protecting Against Traffic Redirection  . . . . . . . . .   9
-     5.4.  Protecting Against Traffic Replay . . . . . . . . . . . .  10
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  12
-     8.2.  Informational References  . . . . . . . . . . . . . . . .  12
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  13
+     5.4.  Protecting Against Traffic Replay . . . . . . . . . . . .  11
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  13
+     8.2.  Informational References  . . . . . . . . . . . . . . . .  13
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Requirements Notation
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Migault, et al.          Expires August 3, 2018                 [Page 2]
+Migault, et al.          Expires August 4, 2018                 [Page 2]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
@@ -165,7 +165,7 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
 
 
-Migault, et al.          Expires August 3, 2018                 [Page 3]
+Migault, et al.          Expires August 4, 2018                 [Page 3]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
@@ -204,7 +204,11 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
 3.  Terminology
 
    This document uses the terminology of [RFC8014], [RFC7365] and
-   [I-D.ietf-nvo3-geneve]
+   [I-D.ietf-nvo3-geneve].  In addition to these document the following
+   term is used:
+
+   o  Immutable Geneve Option: designate a Geneve Option that are not
+      expected to be modified by any on path element, such as a GTN.
 
 4.  Security Threats
 
@@ -213,18 +217,17 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
    [I-D.ietf-nvo3-security-requirements] are considered for the Geneve
    overlay network.  Furthermore, the attackers knowing the details of
    the Geneve packets can perform their attacks by changing fields in
-   the Geneve tunnel header, base header, Geneve options and Geneve
-   packet inner payload.
 
 
 
 
-
-
-Migault, et al.          Expires August 3, 2018                 [Page 4]
+Migault, et al.          Expires August 4, 2018                 [Page 4]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
+
+   the Geneve tunnel header, base header, Geneve options and Geneve
+   packet inner payload.
 
    Threats include traffic analysis, sniffing, injection, redirection,
    and replay.  Based on these threats, this document enumerates the
@@ -271,16 +274,17 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
    that can either generate load on the system or crash the system or
    application.  TCP syn flood typically overload the TS while not
    requiring the ability to receive responses.  Note that udp
-   application are privileged target as they do not require the
-   establishment of a session and are expected to treat any incoming
-   packets.
 
 
 
-Migault, et al.          Expires August 3, 2018                 [Page 5]
+Migault, et al.          Expires August 4, 2018                 [Page 5]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
+
+   application are privileged target as they do not require the
+   establishment of a session and are expected to treat any incoming
+   packets.
 
    Traffic injection may also be used to flood the virtual network to
    disrupt the communications between the TS or to introduce additional
@@ -329,11 +333,7 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
 
 
-
-
-
-
-Migault, et al.          Expires August 3, 2018                 [Page 6]
+Migault, et al.          Expires August 4, 2018                 [Page 6]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
@@ -389,7 +389,7 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
 
 
-Migault, et al.          Expires August 3, 2018                 [Page 7]
+Migault, et al.          Expires August 4, 2018                 [Page 7]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
@@ -411,13 +411,44 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
    Packet MAY be checked by underlay intermediary nodes.
 
    Based on a policy partial authentication MAY be performed on Geneve
-   packets if tenant's system is protecting it's communication.
+   packets if tenant's system is protecting it's communication.  In
+   situations where the tenant system is already encrypting its traffic
+   with application-level encryption (e.g., S/MIME), transport
+   encryption (e.g., TLS), or IP encryption (e.g., IPsec ESP), it is
+   redundant for the NVE to apply additional encryption.  Note that
+   relaying on upper security layers, results from a compromise between
+   security and performance as it may introduce cut and paste
+   vulnerability.
+
+   The Geneve architecture considers intermediary nodes designated as
+   GTN.  A protection established between NVE SHOULD NOT prevent GTN to
+   perform their operations, such as the insertion of a Geneve Option,
+   authenticating a Geneve Option or steering Geneve packets.  In the
+   later case, in order to ease the transition from a non secured to
+   secure Geneve overlay network, it is expected that GTN that are not
+   aware of Geneve security mechanisms can steer authenticated Geneve
+   packets the same way as non protected Geneve packets.  Similarly, the
+   transition from non secure to secure Geneve overlay network may also
+   be performed by introducing GTN that performs the security
+   functionalities - such as authentication of Geneve packets- on behalf
+   of NVE.
 
    This leads to the following security requirements:
 
-   GEN-REQ3:  A Geneve NVE MUST be able to authenticate the Geneve
-              tunnel Header, and/or the Geneve base header, and/or the
-              immutable Geneve Options, and/or the Geneve payload.
+   GEN-REQ3:  A Geneve NVE MUST be able to authenticate at least one of
+              the Geneve tunnel Header, the Geneve base header, the
+              immutable Geneve Options, or the Geneve payload.  The
+              combination of fields that are authenticated is defined by
+              security policies.
+
+
+
+
+
+Migault, et al.          Expires August 4, 2018                 [Page 8]
+
+Internet-Draft    Geneve Protocol Security Requirements     January 2018
+
 
    GEN-REQ4:  A Geneve NVE MAY be able to authenticate only a portion of
               the Geneve payload if the Tenant's system is protecting
@@ -430,26 +461,23 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
               Option into a authenticated Geneve Packet - protected by
               the source Geneve NVE.
 
-   GEN-REQ7:  A GTN MUST be capable of forwarding the Geneve
-              authenticated packet as an non-authenticated Geneve
-              Packet.
+   GEN-REQ7:  A GTN capable of forwarding non-authenticated Geneve
+              packets MUST be capable of forwarding the Geneve
+              authenticated packet without any additional security
+              specific functionalities.  In other words, forwarding
+              authenticated Geneve packet MUST done the same way as
+              authenticated Geneve packets.
 
    GEN-REQ8:  A Geneve NVE SHOULD be able to set different security
-              policies for different flows.  These flows MUST be
-              identified from the Geneve Header and/or Geneve Options as
-              well as some inner traffic selectors.
+              policies for different flows.  A flow MUST be identified
+              at minimum by the Geneve virtual network identifier and
+              the inner IP and transport headers, and optionally
+              additional fields which define a flow (e.g., inner IP
+              DSCP, IPv6 flow id, Geneve options).
 
    GEN-REQ9:  In the case when Tenant systems secure their
               communications using protocols such as TLS or IPsec.  A
               Geneve NVE MAY be able to selectively encrypt and/or
-
-
-
-Migault, et al.          Expires August 3, 2018                 [Page 8]
-
-Internet-Draft    Geneve Protocol Security Requirements     January 2018
-
-
               authenticate only the sections that are not encrypted/
               authenticated by the Tenant System.  For example, only the
               IP, transport (TCP / UDP) in case of TLS/DTLS MAY be
@@ -468,7 +496,24 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
    A rogue device of the NVO3 overlay Geneve network or the underlay
    network may redirect the traffic from a virtual network to the
-   attacker for passive or active attacks.
+   attacker for passive or active attacks.  If the rogue device is in
+   charge of the securing the Geneve packet, then Geneve security
+
+
+
+Migault, et al.          Expires August 4, 2018                 [Page 9]
+
+Internet-Draft    Geneve Protocol Security Requirements     January 2018
+
+
+   mechanisms are not intended to address this threat.  More
+   specifically, a rogue source NVE will still be able to redirect the
+   traffic in clear text before protecting ( and encrypting the packet).
+   A rogue destination NVE will still be able to redirect the traffic in
+   clear text after decrypting the Geneve packets.  The same occurs with
+   GTN that are in charge of encrypting and decrypting a Geneve Packet,
+   Geneve Option or any information.  The security mechanisms are
+   intended to protect a Geneve information from any on path node.
 
    To prevent an attacker located in the middle between the NVEs and
    modifying the tunnel address information in the data packet header to
@@ -477,6 +522,19 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
    Based on a policy partial encryption MAY be performed on Geneve
    packets if tenant's system is protecting it's communication.
+
+   The Geneve architecture considers intermediary nodes designated as
+   GTN.  A protection established between NVE SHOULD NOT prevent GTN to
+   perform their operations, such as the insertion of a Geneve Option,
+   encrypting a Geneve Option or steering Geneve packets.  In the later
+   case, in order to ease the transition from a non secured to secure
+   Geneve overlay network, it is expected that GTN that are not aware of
+   Geneve security mechanisms can steer encrypted Geneve packets the
+   same way as non protected Geneve packets.  Similarly, the transition
+   from non secure to secure Geneve overlay network may also be
+   performed by introducing GTN that performs the security
+   functionalities - such as encryption of Geneve packets- on behalf of
+   NVE.
 
    This leads to the following security requirements:
 
@@ -496,16 +554,16 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
               cryptographic keys to protect the unicast tunnels between
               NVEs respectively.
 
-   GEN-REQ14: If there are multicast packets, a Geneve NVE SHOULD be
-              able to assign distinct cryptographic group keys to
 
 
 
-Migault, et al.          Expires August 3, 2018                 [Page 9]
+Migault, et al.          Expires August 4, 2018                [Page 10]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
 
+   GEN-REQ14: If there are multicast packets, a Geneve NVE SHOULD be
+              able to assign distinct cryptographic group keys to
               protect the multicast packets exchanged among the NVEs
               within different multicast groups.  Upon receiving a data
               packet, an egress Geneve NVE MUST be able to verify
@@ -545,23 +603,23 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
    This leads to the following security requirements:
 
-   GEN-REQ15: A Geneve NVE or a GTN SHOULD be able to validate the
-              Geneve Header corresponds to the Geneve payload, and
-              discard such packets.
+   GEN-REQ15: A Geneve NVE or a GTN MUST be able to validate the Geneve
+              Header corresponds to the Geneve payload, and discard such
+              packets.
 
    GEN-REQ16: A Geneve NVE or a GTN SHOULD provide anti replay
               mechanisms and discard replayed packet.
 
-   The requirements in this section are inline with REQ 10 and 14 in
-   [I-D.ietf-nvo3-security-requirements], and they further specifies
 
 
 
-Migault, et al.          Expires August 3, 2018                [Page 10]
+Migault, et al.          Expires August 4, 2018                [Page 11]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
 
+   The requirements in this section are inline with REQ 10 and 14 in
+   [I-D.ietf-nvo3-security-requirements], and they further specifies
    requirements to validate that a Geneve Header corresponds to the
    Geneve payload.
 
@@ -611,9 +669,7 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
 
 
-
-
-Migault, et al.          Expires August 3, 2018                [Page 11]
+Migault, et al.          Expires August 4, 2018                [Page 12]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
@@ -669,7 +725,7 @@ Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
 
 
-Migault, et al.          Expires August 3, 2018                [Page 12]
+Migault, et al.          Expires August 4, 2018                [Page 13]
 
 Internet-Draft    Geneve Protocol Security Requirements     January 2018
 
@@ -725,4 +781,4 @@ Authors' Addresses
 
 
 
-Migault, et al.          Expires August 3, 2018                [Page 13]
+Migault, et al.          Expires August 4, 2018                [Page 14]

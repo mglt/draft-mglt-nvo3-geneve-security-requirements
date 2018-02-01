@@ -175,7 +175,15 @@ this document.</t>
 <section title="Terminology">
 
 <t>This document uses the terminology of <xref target="RFC8014"/>, <xref
-target="RFC7365"/> and <xref target="I-D.ietf-nvo3-geneve"/></t>
+target="RFC7365"/> and <xref target="I-D.ietf-nvo3-geneve"/>. In
+addition to these document the following term is used:
+
+<list style="symbols">
+
+<t>Immutable Geneve Option: designate a Geneve Option that are not expected to
+be modified by any on path element, such as a GTN.</t>
+
+</list></t>
 
 </section>
 
@@ -357,15 +365,35 @@ incoming Geneve packets from the source NVE. Authenticated Geneve Packet
 MAY be checked by underlay intermediary nodes.</t>
 
 <t>Based on a policy partial authentication MAY be performed on Geneve
-packets if tenant's system is protecting it's communication.</t>
+packets if tenant's system is protecting it's communication. In
+situations where the tenant system is already encrypting its traffic
+with application-level encryption (e.g., S/MIME), transport encryption
+(e.g., TLS), or IP encryption (e.g., IPsec ESP), it is redundant for the
+NVE to apply additional encryption. Note that relaying on upper security
+layers, results from a compromise between security and performance as it
+may introduce cut and paste vulnerability. </t>
+
+<t>The Geneve architecture considers intermediary nodes designated as
+GTN. A protection established between NVE SHOULD NOT prevent GTN to
+perform their operations, such as the insertion of a Geneve Option,
+authenticating a Geneve Option or steering Geneve packets. In the later
+case, in order to ease the transition from a non secured to secure
+Geneve overlay network, it is expected that GTN that are not aware of
+Geneve security mechanisms can steer authenticated Geneve packets the
+same way as non protected Geneve packets. Similarly, the transition from
+non secure to secure Geneve overlay network may also be performed by
+introducing GTN that performs the security functionalities - such as
+authentication of Geneve packets- on behalf of NVE. </t>
+
 
 <t>This leads to the following security requirements:
 
 <list style="format GEN-REQ%d:" counter="my_count">
 
-<t>A Geneve NVE MUST be able to authenticate the Geneve tunnel Header,
-and/or the Geneve base header, and/or the immutable Geneve Options,
-and/or the Geneve payload.</t>
+<t>A Geneve NVE MUST be able to authenticate at least one of the Geneve
+tunnel Header, the Geneve base header, the immutable Geneve Options, or
+the Geneve payload.  The combination of fields that are authenticated is
+defined by security policies.</t>
 
 <t>A Geneve NVE MAY be able to authenticate only a portion of the Geneve
 payload if the Tenant's system is protecting its communication.</t>
@@ -376,12 +404,18 @@ reaches the Geneve destination NVE.</t>
 <t>A GTN MUST be able to insert an authenticated Geneve Option into a
 authenticated Geneve Packet - protected by the source Geneve NVE.</t>
 
-<t>A GTN MUST be capable of forwarding the Geneve authenticated packet
-as an non-authenticated Geneve Packet.</t>
+<t>A GTN capable of forwarding non-authenticated Geneve packets MUST be
+capable of forwarding the Geneve authenticated packet without any
+additional security specific functionalities. In other words, forwarding
+authenticated Geneve packet MUST done the same way as authenticated
+Geneve packets.</t>
 
 <t>A Geneve NVE SHOULD be able to set different security policies for
-different flows. These flows MUST be identified from the Geneve Header
-and/or Geneve Options as well as some inner traffic selectors.</t>  
+different flows. 
+A flow MUST be identified at minimum by the Geneve virtual network
+identifier and the inner IP and transport headers, and optionally
+additional fields which define a flow (e.g., inner IP DSCP, IPv6 flow
+id, Geneve options).</t>
 
 <t>In the case when Tenant systems secure their communications using
 protocols such as TLS or IPsec. A Geneve NVE MAY be able to selectively
@@ -410,7 +444,16 @@ partially encrypt the same.</t>
 
 <t>A rogue device of the NVO3 overlay Geneve network or the underlay
 network may redirect the traffic from a virtual network to the
-attacker for passive or active attacks.</t>
+attacker for passive or active attacks. If the rogue device is in charge
+of the securing the Geneve packet, then Geneve security mechanisms are
+not intended to address this threat. More specifically, a rogue source
+NVE will still be able to redirect the traffic in clear text before
+protecting ( and encrypting the packet). A rogue destination NVE will
+still be able to redirect the traffic in clear text after decrypting the
+Geneve packets. The same occurs with GTN that are in charge of
+encrypting and decrypting a Geneve Packet,  Geneve Option or any
+information. The security mechanisms are intended to protect a Geneve
+information from any on path  node. </t>
 
 <t>To prevent an attacker located in the middle between the NVEs and
 modifying the tunnel address information in the data packet header to
@@ -419,6 +462,19 @@ protection for data traffics exchanged between NVEs.</t>
 
 <t>Based on a policy partial encryption MAY be performed on Geneve
 packets if tenant's system is protecting it's communication.</t>
+
+<t>The Geneve architecture considers intermediary nodes designated as
+GTN. A protection established between NVE SHOULD NOT prevent GTN to
+perform their operations, such as the insertion of a Geneve Option,
+encrypting a Geneve Option or steering Geneve packets. In the later
+case, in order to ease the transition from a non secured to secure
+Geneve overlay network, it is expected that GTN that are not aware of
+Geneve security mechanisms can steer encrypted Geneve packets the
+same way as non protected Geneve packets. Similarly, the transition from
+non secure to secure Geneve overlay network may also be performed by
+introducing GTN that performs the security functionalities - such as
+encryption of Geneve packets- on behalf of NVE. </t>
+
 
 <t>This leads to the following security requirements:
 
@@ -485,7 +541,7 @@ components.</t>
 
 <list style="format GEN-REQ%d:" counter="my_count">
 
-<t>A Geneve NVE or a GTN SHOULD be able to validate the Geneve Header
+<t>A Geneve NVE or a GTN MUST be able to validate the Geneve Header
 corresponds to the Geneve payload, and discard such packets.</t>
 
 <t>A Geneve NVE or a GTN SHOULD provide anti replay mechanisms and
