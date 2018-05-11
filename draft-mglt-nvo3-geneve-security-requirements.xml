@@ -128,11 +128,28 @@ network may encounter and tries to provide a list of essential security
 requirements that needs to be fulfilled. In addition, this document
 lists the requirements to protect the Geneve packet components defined
 in <xref target="I-D.ietf-nvo3-geneve"/> that include the Geneve tunnel
-IP and UDP header, the Geneve Header, Geneve options, and inner payload.
-Protecting the complete Geneve packet - that is the full IP packet or
-the full outer UDP payload  for example - is out of scope of this
-document, given that this can be supported using existing
-mechanisms.</t> 
+IP and UDP header, the Geneve Header, Geneve options, and inner
+payload.</t>
+
+<t>Security of the Geneve packet may be achieved using various
+mechanisms. Typically, some deployments may use a limited subset of the
+capabilities provided by Geneve and rely on specific assumptions. Given
+these specificities, the secure deploymenet of a given Geneve deployment
+may be achived reusing specific mechanisms such as for example DTLS or
+IPsec. On the other hand, the definition of a security mechanisms that
+enables to secure any Geneve deployment requires the design of a Geneve
+specific mechanism.</t>
+
+<t>The primary goal of this document is to list the requirements a
+Geneve security mechanism needs to fulfill to be able to secure any
+Geneve deployment. Such Geneve security mechanism is expected to
+fullfill all security requirements listed in the document.</t>
+
+<t>This document may also be used by network architect to check
+whether specific mechanisms may be used to secure a specifc Geneve
+deployement. In order to ease the task of the netwok architect, the
+document will clearly state the condition under which the security
+requirements needs to be fulfilled by the security mechanism.</t>
 
 <t>This document assumes that a tenant subscribes to an overlay cloud
 provider for hosting its Tenant Systems, the cloud provider manages the
@@ -154,34 +171,6 @@ injected to other tenants.</t>
 Geneve overlay or underlay networks.</t>
 
 </list></t>
-
-<t>In summary, the document defines the security requirements to protect
-tenants overlay traffic against security threats from the NVO3 network
-components that are interconnected with tunnels implemented using
-Geneve.</t>
-
-<t>The security requirements in the document are expressed regarding the
-threats to mitigate. It is expected that a security mechanism
-designed for NVO3 overlay network implementing Geneve is able to
-mitigate all the threats and as such fulfills all the security
-requirements expressed in the document. The document RECOMMENDs that the
-definition of a Geneve security mechanism fulfills all requirements
-expressed in this document</t>
-
-<t>On the other hand, the specificities and the context of some Geneve
-deployments may consider the risk associated to some threats as very
-low and as such ignore the threats. In such cases, a specific security
-mechanism designed for that specific deployment may not fulfill all the
-requirements associated to that given threat. This document RECOMMENDs
-to consider all the threats while designing a security mechanism for the
-Geneve overlay network. In addition, some deployments may not take
-advantage of some features provided by Geneve, in which case, a specific
-security mechanisms designed for a specific deployment may not fulfill
-the requirements associated to that feature. This document RECOMMENDs
-that such specific security mechanisms be an intermediary approach toward
-the deployment of a Geneve security mechanism. In fact, such specific
-mechanisms present the risk to ossifying Geneve as well as the security
-being lowered in favor of Geneve features.</t>
 
 <t>The document strongly recommend to re-use existing security protocols
 like IP Security (IPsec) <xref target="RFC4301"/> and Transport Layer
@@ -344,8 +333,9 @@ encryption (e.g., <xref target="RFC7516">JSON Web Encryption</xref>),
 application TLS, guest IPsec ESP, or hypervisor IPsec ESP can be used.
 Each provides the same protection against a passive listener.</t>
 
-<t>To protect against the above-described traffic sniffing attacks, we
-require:
+<t>To protect against the above-described traffic sniffing attacks, the
+security mechanism used to protect teh Geneve overlay needs to fullfill
+the security requirements below: 
 
 <list style="format GEN-REQ%d:" counter="my_count">
 
@@ -356,16 +346,19 @@ could also be performed, for example, by the TS.</t>
 <t>To provide best protection from traffic analysis, the NVE SHOULD
 encrypt the payload fields that appears in clear. Typically, this could
 include VM's inner IP address, transport header, and IP payload when
-Geneve carries IP packets.</t>
+Geneve carries IP packets. Note that encryption may be performed
+by multiple parties, and that the NVE is not necessarily expected to
+take in charge the full encryption of the payload carried by the NVO3
+overlay.</t>
 
 </list></t>
 
+<!--
 <t>GEN-REQ1 and GEN-REQ2 are inline with NVE-NVE and NVE-Hypervisor data
 plane security requirements for confidentiality in <xref
 target="I-D.ietf-nvo3-security-requirements"/> like REQ 10, 11 and
 16.</t>
 
-<!--
 <t>GEN-REQ2, further explicitly enables that encryption may be performed
 by multiple parties, and that the NVE is not necessarily expected to
 take in charge the full encryption of the payload carried by the NVO3
@@ -422,36 +415,28 @@ introducing GTN that performs the security functionalities - such as
 authentication of Geneve packets- on behalf of NVE. </t>
 
 
-<t>This leads to the following security requirements:
+<t>To protect against the above-described traffic injection attacks, the
+security mechanism used to protect the Geneve overlay needs to fulfill
+the security requirements below: 
 
 <list style="format GEN-REQ%d:" counter="my_count">
 
-<t>A Geneve NVE MUST be able to authenticate at least one of the Geneve
-tunnel Header, the Geneve base header, the immutable Geneve Options, or
-the Geneve payload.  The combination of fields that are authenticated is
-defined by security policies.</t>
-
-<t>A Geneve NVE MAY be able to authenticate only a portion of the Geneve
-payload if the Tenant's system is protecting its communication.</t>
-
-<t>A GTN MAY be able to validate the authentication before the packet
-reaches the Geneve destination NVE.</t>
-
-<t>A GTN MUST be able to insert an authenticated Geneve Option into a
-authenticated Geneve Packet - protected by the source Geneve NVE.</t>
-
-<t>A GTN capable of forwarding non-authenticated Geneve packets MUST be
-capable of forwarding the Geneve authenticated packet without any
-additional security specific functionalities. In other words, forwarding
-authenticated Geneve packet MUST done the same way as authenticated
-Geneve packets.</t>
+<t>A Geneve NVE MUST be able to authenticate the Geneve tunnel Header,
+the Geneve base header, the immutable Geneve Options, and the Geneve
+payload.  The combination of fields that are authenticated is defined by
+security policies. Some security policies MAY require each field to be
+authenticated independently.</t>
 
 <t>A Geneve NVE SHOULD be able to set different security policies for
-different flows. 
-A flow MUST be identified at minimum by the Geneve virtual network
-identifier and the inner IP and transport headers, and optionally
-additional fields which define a flow (e.g., inner IP DSCP, IPv6 flow
-id, Geneve options).</t>
+different flows.  A flow MUST be identified at minimum by the Geneve
+virtual network identifier and the inner IP and transport headers, and
+optionally additional fields which define a flow (e.g., inner IP DSCP,
+IPv6 flow id, Geneve options).</t>
+
+<!-- I do not see the difference between the two:
+<t>A Geneve NVE MAY be able to authenticate only a portion of the Geneve
+payload if the Tenant's system is protecting its communication.</t>
+-->
 
 <t>In the case when Tenant systems secure their communications using
 protocols such as TLS or IPsec. A Geneve NVE MAY be able to selectively
@@ -463,16 +448,25 @@ encrypted/authenticated.</t>
 
 </list></t>
 
+<t> In addition, some Geneve overlay may relay on GTN that play an
+active role in the security of the overlay, in which case, the security
+mechanisms needs to fulfill the security requirements below: 
 
-<t>Requirements listed in this section are inline with authentication and
-integrity requirements in <xref
-target="I-D.ietf-nvo3-security-requirements"/>, like
-REQ 9, 10, 11, 14 and 16.</t>
+<list style="format GEN-REQ%d:" counter="my_count">
 
-<t>The requirements further define mechanisms to fully and partially
-authenticate Geneve Header, and Geneve options, as well fully and
-partially encrypt the same.</t>
+<t>A GTN MAY be able to validate the authentication before the packet
+reaches the Geneve destination NVE.</t>
 
+<t>A GTN MUST be able to insert an authenticated Geneve Option into a
+authenticated Geneve Packet - protected by the source Geneve NVE.</t>
+
+<t>A GTN capable of forwarding non-authenticated Geneve packets MUST be
+capable of forwarding the Geneve authenticated packet without any
+additional security specific functionalities. In other words, forwarding
+authenticated Geneve packet MUST done the same way as non-authenticated
+Geneve packets.</t>
+
+</list></t>
 
 </section>
 
@@ -489,7 +483,10 @@ still be able to redirect the traffic in clear text after decrypting the
 Geneve packets. The same occurs with GTN that are in charge of
 encrypting and decrypting a Geneve Packet,  Geneve Option or any
 information. The security mechanisms are intended to protect a Geneve
-information from any on path  node. </t>
+information from any on path  node. Note that modern cryptography
+recommend the use of authenticated encryption. This section assumes such
+algorithms are used, and as such encrypted packets are also
+authenticated.</t>
 
 <t>To prevent an attacker located in the middle between the NVEs and
 modifying the tunnel address information in the data packet header to
@@ -512,7 +509,10 @@ introducing GTN that performs the security functionalities - such as
 encryption of Geneve packets- on behalf of NVE. </t>
 
 
-<t>This leads to the following security requirements:
+<t>To protect against the above-described traffic redirection attacks, the
+security mechanism used to protect the Geneve overlay needs to fulfill
+the security requirements below: 
+
 
 <list style="format GEN-REQ%d:" counter="my_count">
 
@@ -521,10 +521,6 @@ Geneve Payload and/or Geneve Options not intended for the GTN.</t>
 
 <t>A Geneve NVE MAY be able encrypt portion of Geneve Payload as well as
 as Geneve Options not intended for the GTN.</t>
-
-<t>A transit underlay intermediary node MUST be able to insert an
-encrypted Geneve Option into an encrypted/authenticated Geneve Packet -
-protected by the source Geneve NVE.</t>
 
 <t>A Geneve NVE SHOULD be able to assign different cryptographic
 keys to protect the unicast tunnels between NVEs respectively.</t>
@@ -538,15 +534,24 @@ to forward that packet.</t>
 
 </list></t>
 
-<t>Requirements listed in this section are inline with the requirements
-in the data plane sections in <xref
-target="I-D.ietf-nvo3-security-requirements"/> to
-protect against traffic redirection and man in the middle attacks.</t>
+<t> In addition, some Geneve overlay may relay on GTN that play an
+active role in the security of the overlay, in which case, the security
+mechanisms needs to fulfill the security requirements below: 
 
-<t>The requirements further define mechanisms for a transit intermediary
-node to insert an encrypted Geneve option to an encrypted/authenticated
-Geneve packet.</t>
+<list style="format GEN-REQ%d:" counter="my_count">
 
+<t>A GTN MAY be able to validate the decrypt before the packet
+reaches the Geneve destination NVE.</t>
+
+<t>A GTN MUST be able to insert an encrypted Geneve Option into an
+encrypted/authenticated Geneve Packet - protected by the source Geneve NVE.</t>
+
+<t>A GTN capable of forwarding non-encrypted Geneve packets MUST be
+capable of forwarding the Geneve encrypted packet without any
+additional security specific functionalities. In other words, forwarding
+encrypted Geneve packet MUST done the same way as non-encrypted
+Geneve packets.</t>
+</list></t>
 
 </section>
 
@@ -580,15 +585,19 @@ components.</t>
 <t>A Geneve NVE or a GTN MUST be able to validate the Geneve Header
 corresponds to the Geneve payload, and discard such packets.</t>
 
+</list></t>
+
+<t> In addition, some Geneve overlay may relay on GTN that play an
+active role in the security of the overlay, in which case, the security
+mechanisms needs to fulfill the security requirements below: 
+
+<list style="format GEN-REQ%d:" counter="my_count">
+
 <t>A Geneve NVE or a GTN SHOULD provide anti replay mechanisms and
 discard replayed packet.</t>
 
 </list></t>
 
-<t>The requirements in this section are inline with REQ 10 and 14 in
-<xref target="I-D.ietf-nvo3-security-requirements"/>, and they further
-specifies requirements to validate that a Geneve Header corresponds to
-the Geneve payload.</t>
 
 </section>
 
