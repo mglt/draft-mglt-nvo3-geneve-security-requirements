@@ -95,7 +95,7 @@ Table of Contents
    9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .  15
      9.2.  Informative References  . . . . . . . . . . . . . . . . .  16
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Requirements Notation
 
@@ -215,9 +215,9 @@ Internet-Draft        Geneve Security Requirements          October 2018
        by Geneve and rely on specific assumptions.  Given these
        specificities, the secure deployment of a given Geneve deployment
        may be achieved reusing specific mechanisms such as for example
-       DTLS or IPsec.  On the other hand, the definition of a security
-       mechanisms that enables to secure any Geneve deployment requires
-       the design of a Geneve specific mechanism.  Note that the
+       DTLS [RFC6347] or IPsec [RFC4301].  On the other hand, the
+       definition of a security mechanisms that enables to secure any
+       Geneve deployment requires the design of a Geneve specific
 
 
 
@@ -226,18 +226,18 @@ Migault, et al.          Expires April 15, 2019                 [Page 4]
 Internet-Draft        Geneve Security Requirements          October 2018
 
 
-       security s limited to the security of the data plane only.
-       Additional requirements for the control plan MAY be considered in
-       [I-D.ietf-nvo3-security-requirements].
+       mechanism.  Note that the security s limited to the security of
+       the data plane only.  Additional requirements for the control
+       plan MAY be considered in [I-D.ietf-nvo3-security-requirements].
 
    2.  SEC-GEN: requirements a security mechanism need to fulfill to
        secure any deployment of Geneve overlay deployment.  Such
        mechanism may require the design of a specific solution.  In the
        case new protocol needs to be design, the document strongly
        recommend to re-use existing security protocols like IP Security
-       (IPsec) [RFC4301] and Transport Layer Security (TLS) [RFC5246],
-       and existing encryption algorithms ( such as [RFC8221]), and
-       authentication protocols.
+       (IPsec) [RFC4301] and Datagram Transport Layer Security (DTLS)
+       [RFC6347], and existing encryption algorithms (such as
+       [RFC8221]), and authentication protocols.
 
    This document assumes the following roles are involved: - Tenant:
    designates the entity that connects various systems within a single
@@ -431,13 +431,13 @@ Internet-Draft        Geneve Security Requirements          October 2018
    The inner payload, unless protection is provided by the Tenant System
    reveals the content of the communication.  This may mitigate by the
    Tenant using application level security such as, for example JSON Web
-   Encryption [RFC7516] or transport layer security such as DTLS or TLS
-   or IPsec/ESP.  However none of these security protocols are
-   sufficient to protect the entire inner payload.  IPsec/ESP still
-   leave in clear the optional L2 layer information as well as the IP
-   addresses and some IP options.  In addition to these pieces of
-   information, the use of TLS or DTLS reveals the transport layer
-   protocol as well as ports.
+   Encryption [RFC7516] or transport layer security such as DTLS
+   [RFC6347] or TLS [RFC8446] or IPsec/ESP [RFC4303].  However none of
+   these security protocols are sufficient to protect the entire inner
+   payload.  IPsec/ESP still leave in clear the optional L2 layer
+   information as well as the IP addresses and some IP options.  In
+   addition to these pieces of information, the use of TLS or DTLS
+   reveals the transport layer protocol as well as ports.
 
    A secure deployment of a Geneve overlay must fulfill the requirement
    below:
@@ -471,8 +471,8 @@ Internet-Draft        Geneve Security Requirements          October 2018
    related to the communications.  Note that a Geneve packet may have a
    combination of Geneve options that needs to be read by transit
    device, in which case this option needs to be read by the transit
-   device while other options MAY only be accessed by the terminating
-   NVE.  Information revealed as well as correlation with traffic
+   device while other options MAY only be accessed by the tunnel
+   endpoint.  Information revealed as well as correlation with traffic
    volumetry may reveal pattern traffic within a given virtualized
    network as well as any information revealed by the current and future
    Geneve Option.
@@ -574,8 +574,8 @@ Internet-Draft        Geneve Security Requirements          October 2018
    A Geneve security mechanism must fulfill the requirements below:
 
    o  SEC-GEN-8: Geneve Security mechanism MUST provide means for a
-      terminating node (NVE) to authenticate data prior it is being
-      processed.  A terminating node (NVE) MUST be able to authenticate
+      tunnel endpoint (NVE) to authenticate data prior it is being
+      processed.  A tunnel endpoint (NVE) MUST be able to authenticate
       at least:
 
       *  the Geneve Header and a subset of Geneve Options
@@ -675,8 +675,8 @@ Internet-Draft        Geneve Security Requirements          October 2018
 
 
    o  SEC-GEN-10: Geneve Security mechanism MUST provide means for a
-      terminating node (NVE) to validate the Geneve Header corresponds
-      to the Geneve payload, and discard such packets.
+      tunnel endpoint (NVE) to validate the Geneve Header corresponds to
+      the Geneve payload, and discard such packets.
 
 5.5.  Security Management
 
@@ -776,8 +776,8 @@ Internet-Draft        Geneve Security Requirements          October 2018
    Geneve Options or the Geneve Header information.  In addition, TLS
    does not enable that some Geneve option of Header information remain
    in clear text while other are encrypted.  Typically TLS would not be
-   compatible with transit nodes.  In addition is make the Geneve option
-   visible to the transit node, TLS does not provide the ability for a
+   compatible with transit device.  In addition is make the Geneve
+   option visible to the transit device, TLS does not provide the
 
 
 
@@ -786,18 +786,19 @@ Migault, et al.          Expires April 15, 2019                [Page 14]
 Internet-Draft        Geneve Security Requirements          October 2018
 
 
-   transit node to authenticate the option before processing it.  SEC-
-   GEN-5 and SEC-GEN-6 are not met as TLS does not provide padding nor
-   the ability to generate dummy packets.  TLS does not meet SEC-GEN-8
-   that requires the ability to authenticate some combination of Geneve
-   Header, Geneve Options, (partial) inner payload.  TLS does not meet
-   SEC-GEN-9 that requires the ability to authenticate a single Geneve
-   Option.  TLS meets SEC-GEN-10 as it provides anti replay mechanism to
-   the authentication.  SEC-GEN-11 is not natively supported as TLS
-   security is established by UDP destination ports, rather than by
-   flow.  If more than one security policy or flow needs to be
-   considered a binding between flow and ports needs to be established.
-   SEC-GEN-13 is not met for mutlicast traffic.
+   ability for a transit device to authenticate the option before
+   processing it.  SEC-GEN-5 and SEC-GEN-6 are not met as TLS does not
+   provide padding nor the ability to generate dummy packets.  TLS does
+   not meet SEC-GEN-8 that requires the ability to authenticate some
+   combination of Geneve Header, Geneve Options, (partial) inner
+   payload.  TLS does not meet SEC-GEN-9 that requires the ability to
+   authenticate a single Geneve Option.  TLS meets SEC-GEN-10 as it
+   provides anti replay mechanism to the authentication.  SEC-GEN-11 is
+   not natively supported as TLS security is established by UDP
+   destination ports, rather than by flow.  If more than one security
+   policy or flow needs to be considered a binding between flow and
+   ports needs to be established.  SEC-GEN-13 is not met for mutlicast
+   traffic.
 
 7.2.  IPsec
 
@@ -826,14 +827,13 @@ Internet-Draft        Geneve Security Requirements          October 2018
               Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
               December 2005, <https://www.rfc-editor.org/info/rfc4301>.
 
-   [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
-              (TLS) Protocol Version 1.2", RFC 5246,
-              DOI 10.17487/RFC5246, August 2008, <https://www.rfc-
-              editor.org/info/rfc5246>.
+   [RFC4303]  Kent, S., "IP Encapsulating Security Payload (ESP)",
+              RFC 4303, DOI 10.17487/RFC4303, December 2005,
+              <https://www.rfc-editor.org/info/rfc4303>.
 
-   [RFC7258]  Farrell, S. and H. Tschofenig, "Pervasive Monitoring Is an
-              Attack", BCP 188, RFC 7258, DOI 10.17487/RFC7258, May
-              2014, <https://www.rfc-editor.org/info/rfc7258>.
+   [RFC6347]  Rescorla, E. and N. Modadugu, "Datagram Transport Layer
+              Security Version 1.2", RFC 6347, DOI 10.17487/RFC6347,
+              January 2012, <https://www.rfc-editor.org/info/rfc6347>.
 
 
 
@@ -841,6 +841,10 @@ Migault, et al.          Expires April 15, 2019                [Page 15]
 
 Internet-Draft        Geneve Security Requirements          October 2018
 
+
+   [RFC7258]  Farrell, S. and H. Tschofenig, "Pervasive Monitoring Is an
+              Attack", BCP 188, RFC 7258, DOI 10.17487/RFC7258, May
+              2014, <https://www.rfc-editor.org/info/rfc7258>.
 
    [RFC7365]  Lasserre, M., Balus, F., Morin, T., Bitar, N., and Y.
               Rekhter, "Framework for Data Center (DC) Network
@@ -868,6 +872,10 @@ Internet-Draft        Geneve Security Requirements          October 2018
               DOI 10.17487/RFC8221, October 2017, <https://www.rfc-
               editor.org/info/rfc8221>.
 
+   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+              <https://www.rfc-editor.org/info/rfc8446>.
+
 9.2.  Informative References
 
    [I-D.ietf-nvo3-geneve]
@@ -880,6 +888,16 @@ Internet-Draft        Geneve Security Requirements          October 2018
               Zhang, "Security Requirements of NVO3", draft-ietf-nvo3-
               security-requirements-07 (work in progress), June 2016.
 
+
+
+
+
+
+Migault, et al.          Expires April 15, 2019                [Page 16]
+
+Internet-Draft        Geneve Security Requirements          October 2018
+
+
 Authors' Addresses
 
    Daniel Migault
@@ -889,13 +907,6 @@ Authors' Addresses
    Canada
 
    EMail: daniel.migault@ericsson.com
-
-
-
-
-Migault, et al.          Expires April 15, 2019                [Page 16]
-
-Internet-Draft        Geneve Security Requirements          October 2018
 
 
    Sami Boutros
@@ -914,17 +925,6 @@ Internet-Draft        Geneve Security Requirements          October 2018
    Kaloom
 
    EMail: suresh@kaloom.com
-
-
-
-
-
-
-
-
-
-
-
 
 
 

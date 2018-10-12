@@ -165,19 +165,19 @@ achieved using various mechanisms.  Typically, some deployments may use
 a limited subset of the capabilities provided by Geneve and rely on
 specific assumptions. Given these specificities, the secure deployment
 of a given Geneve deployment may be achieved reusing specific mechanisms
-such as for example DTLS or IPsec. On the other hand, the definition of
-a security mechanisms that enables to secure any Geneve deployment
-requires the design of a Geneve specific mechanism. Note that the
-security s limited to the security of the data plane only. Additional
-requirements for the control plan MAY be considered in
-{{?I-D.ietf-nvo3-security-requirements}}. 
+such as for example DTLS {{!RFC6347}} or IPsec {{!RFC4301}}. On the
+other hand, the definition of a security mechanisms that enables to
+secure any Geneve deployment requires the design of a Geneve specific
+mechanism. Note that the security s limited to the security of the data
+plane only. Additional requirements for the control plan MAY be
+considered in {{?I-D.ietf-nvo3-security-requirements}}. 
 
 2. SEC-GEN: requirements a security mechanism need to fulfill to secure
 any deployment of Geneve overlay deployment. Such mechanism may require
 the design of a specific solution. In the case new protocol needs to be
 design, the document strongly recommend to re-use existing security
-protocols like IP Security (IPsec) {{!RFC4301}} and Transport Layer
-Security (TLS) {{!RFC5246}}, and existing encryption algorithms ( such
+protocols like IP Security (IPsec) {{!RFC4301}} and Datagram Transport Layer
+Security (DTLS) {{!RFC6347}}, and existing encryption algorithms (such
 as {{!RFC8221}}),  and authentication protocols.
 
 This document assumes the following roles are involved:
@@ -345,12 +345,13 @@ activity is due to a victim VM.
 The inner payload, unless protection is provided by the Tenant System
 reveals the content of the communication. This may mitigate by the
 Tenant using application level security such as, for example JSON Web
-Encryption {{!RFC7516}} or transport layer security such as DTLS or TLS
-or IPsec/ESP. However none of these security protocols are sufficient to
-protect the entire inner payload. IPsec/ESP still leave in clear the
-optional L2 layer information as well as the IP addresses and some IP
-options. In addition to these pieces of information, the use of TLS or
-DTLS reveals the transport layer protocol as well as ports. 
+Encryption {{!RFC7516}} or transport layer security such as DTLS
+{{!RFC6347}} or TLS {{!RFC8446}} or IPsec/ESP {{!RFC4303}}. However none
+of these security protocols are sufficient to protect the entire inner
+payload. IPsec/ESP still leave in clear the optional L2 layer
+information as well as the IP addresses and some IP options. In addition
+to these pieces of information, the use of TLS or DTLS reveals the
+transport layer protocol as well as ports. 
 
 A secure deployment of a Geneve overlay must fulfill the requirement
 below:
@@ -375,7 +376,7 @@ The Geneve Header and Geneve Options contains metadata information
 related to the communications. Note that a Geneve packet may have a
 combination of Geneve options that needs to be read by transit device,
 in which case this option needs to be read by the transit device while
-other options MAY only be accessed by the terminating NVE. Information
+other options MAY only be accessed by the tunnel endpoint. Information
 revealed as well as correlation with traffic volumetry may reveal
 pattern traffic within a given virtualized network as well as any
 information revealed by the current and future Geneve Option. 
@@ -457,8 +458,8 @@ A Geneve security mechanism must fulfill the requirements
 below: 
 
 * SEC-GEN-8: Geneve Security mechanism MUST provide means for a
-terminating node (NVE) to  authenticate data prior it is being
-processed. A terminating node (NVE) MUST be able to authenticate at
+tunnel endpoint (NVE) to  authenticate data prior it is being
+processed. A tunnel endpoint (NVE) MUST be able to authenticate at
 least:
   * the Geneve Header and a subset of Geneve Options
   * the Geneve Header, a subset of Geneve options and the Geneve
@@ -536,7 +537,7 @@ A Geneve security mechanism must fulfill the requirements
 below: 
 
 * SEC-GEN-10: Geneve Security mechanism MUST provide means for a
-terminating node (NVE) to validate the Geneve Header corresponds to the
+tunnel endpoint (NVE) to validate the Geneve Header corresponds to the
 Geneve payload, and discard such packets.
 
 
@@ -626,8 +627,8 @@ that requires the ability to encrypt of a subset of the Geneve Options
 or the Geneve Header information. In addition, TLS does not enable that
 some Geneve option of Header information remain in clear text while
 other are encrypted. Typically TLS would not be compatible with transit
-nodes. In addition is make the Geneve option visible to the transit
-node, TLS does not provide the ability for a transit node to
+device. In addition is make the Geneve option visible to the transit
+device, TLS does not provide the ability for a transit device to
 authenticate the option before processing it. SEC-GEN-5 and SEC-GEN-6
 are not met as TLS does not provide padding nor the ability to generate
 dummy packets. TLS does not meet SEC-GEN-8 that requires the ability to
