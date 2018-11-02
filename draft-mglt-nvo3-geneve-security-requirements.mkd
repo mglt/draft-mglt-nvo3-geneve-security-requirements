@@ -170,7 +170,10 @@ other hand, the definition of a security mechanisms that enables to
 secure any Geneve deployment requires the design of a Geneve specific
 mechanism. Note that the security s limited to the security of the data
 plane only. Additional requirements for the control plan MAY be
-considered in {{?I-D.ietf-nvo3-security-requirements}}. 
+considered in {{?I-D.ietf-nvo3-security-requirements}}. A given Geneve
+deployment will be considered secured when matching with all SEC-OP
+requirements does not raises any concern. As such the given deployment
+will be considered passing SEC-OP requirements that are not applicable.   
 
 2. SEC-GEN: requirements a security mechanism need to fulfill to secure
 any deployment of Geneve overlay deployment. Such mechanism may require
@@ -178,7 +181,13 @@ the design of a specific solution. In the case new protocol needs to be
 design, the document strongly recommend to re-use existing security
 protocols like IP Security (IPsec) {{!RFC4301}} and Datagram Transport Layer
 Security (DTLS) {{!RFC6347}}, and existing encryption algorithms (such
-as {{!RFC8221}}),  and authentication protocols.
+as {{!RFC8221}}),  and authentication protocols. A given candidate for a
+security mechanism will be considered as valid when matching with all
+SEC-GEN requirements does not raise any concern. In other words,  at
+least all MUST status are met.  
+
+
+
 
 This document assumes the following roles are involved:
 - Tenant: designates the entity that connects various systems within a
@@ -224,14 +233,14 @@ This document uses the terminology of {{!RFC8014}}, {{!RFC7365}} and
 
 # Security Threats
 
-Attacks from compromised NVO3 and underlay network devices, and attacks
-from compromised tenant systems defined in
-{{?I-D.ietf-nvo3-security-requirements}}. This document considers these
-attacks in the scope of Geneve, that is when the attackers knowing the
+This section considers attacks performed by NVE, network devices or any
+other devices using Geneve, that is when the attackers knowing the
 details of the Geneve packets can perform their attacks by changing
 fields in the Geneve tunnel header, base header, Geneve options and
-Geneve inner payload. The scope of Geneve excludes security requirements
-related to the control plane.  
+Geneve inner payload. Attacks related to the control plane are outside
+the scope of this document. The reader is encouraged to read
+{{?I-D.ietf-nvo3-security-requirements}} for a similar threat analysis
+of NVO3 overlay networks.
 
 Threats include traffic analysis, sniffing, injection, redirection, and
 replay. Based on these threats, this document enumerates the security
@@ -251,21 +260,31 @@ those communications occur) and sniffing (examining traffic for useful
 information such as personally-identifyable information or protocol
 information (e.g., TLS certificate, overlay routing protocols).
 
+Passive attacks may also consist in inferring information about a
+virtualized network or some Tenant System from observing the Geneve
+traffic. This could also involve the correlation between observed
+traffic and additional information. For example, a passive network
+observer can determine two virtual machines are communicating by
+manipulating activity or network activity of other virtual machines on
+that same host. For example, the attacker could control (or be otherwise
+aware of) network activity of the other VMs running on the same host,
+and deduce other network activity is due to a victim VM. 
+
 A rogue element of the overlay Geneve network under the control of an
 attacker may leak and redirect the traffic from a virtual network to the
 attacker for passive monitoring {{!RFC7258}}.
 
-Avoiding leaking information is hard to enforced and the security
-requirements expect to mitigate such attacks by lowering the
-consequences, typically making leaked data unusable to an attacker..
-
+Avoiding leaking information is hard to enforced. The security
+requirements provided in section {{sniffing} expect to mitigate such
+attacks by lowering the consequences, typically making leaked data
+unusable to an attacker.
 
 ## Active Attacks
 
-Active attacks involve modifying packets, injecting packets, or
-interfering with packet delivery (such as by corrupting packet
-checksum). Active attack may target the Tenant System or the Geneve
-overlay. 
+Active attacks involve modifying Geneve packets, injecting Geneve 
+packets, or interfering with Geneve packet delivery (such as by
+corrupting packet checksum). Active attack may target the Tenant System
+or the Geneve overlay.
 
 There are multiple motivations to inject illegitimate traffic into a
 tenants network. When the rogue element is on the path of the TS
@@ -332,15 +351,6 @@ communications.
 
 ## Protection Against Traffic Sniffing {#sniffing}
 
-Passive attacks consists in inferring information about a virtualized
-network or some Tenant System from observing the traffic. This could
-also involve the correlation between observed traffic and additional
-information.  For example, a passive network observer can determine two
-virtual machines are communicating by manipulating activity or network
-activity of other virtual machines on that same host. For example, the
-attacker could control (or be otherwise aware of) network activity of
-the other VMs running on the same host, and deduce other network
-activity is due to a victim VM. 
 
 The inner payload, unless protection is provided by the Tenant System
 reveals the content of the communication. This may mitigate by the
@@ -386,8 +396,9 @@ below:
 
 * SEC-OP-2: A secure deployment of a Geneve overlay MUST evaluate the
 information associated to the leakage of the Geneve Outer Header, Geneve
-Header and Geneve Option. When those information are likely to carry
-sensitive information. they MUST NOT be transmit in clear text.  
+Header and Geneve Option. When a risk analysis concludes that the risk
+of leaking sensitive information is too high, such  MUST NOT be transmit
+in clear text.  
 * SEC-OP-3: A secure deployment of a Geneve overlay MUST evaluate the
 risk associated to traffic pattern recognition. When a risk has been
 identified, traffic pattern recognition MUST be addressed with padding
@@ -525,13 +536,13 @@ components.
 A secure deployment of a Geneve overlay must fulfill the requirement
 below:
 
-* SEC-OP-6: A secure deployment of a Geneve overlay MUST evaluate the
-flows subject to replay attacks. Flows that are subject to this attacks
-MUST be authenticated with an anti replay mechanism. Note that when
-partial authentication is provided, the part not covered by the
-authentication remains a surface of attack. It is strongly RECOMMENDED
-that the Geneve Header is both authenticated with anti replay
-protection. 
+* SEC-OP-6: A secure deployment of a Geneve overlay MUST evaluate the 
+communications subject to replay attacks. Communications that are 
+subject to this attacks MUST be authenticated with an anti replay
+mechanism. Note that when partial authentication is provided, the part
+not covered by the authentication remains a surface of attack. It is
+strongly RECOMMENDED that the Geneve Header is both authenticated with
+anti replay protection.
 
 A Geneve security mechanism must fulfill the requirements
 below: 
@@ -597,6 +608,7 @@ architecture security requirements go beyond the scope of Geneve
 communications, and as such are more likely to address the security
 needs upon deploying an Geneve overlay network.
 
+# Appendix
 
 ## TLS
 
