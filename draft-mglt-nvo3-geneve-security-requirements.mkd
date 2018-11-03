@@ -366,7 +366,7 @@ transport layer protocol as well as ports.
 A secure deployment of a Geneve overlay must fulfill the requirement
 below:
 
-1. SEC-OP-1: A secure deployment of a Geneve overlay SHOULD by default
+* SEC-OP-1: A secure deployment of a Geneve overlay SHOULD by default
 encrypt the inner payload. A Geneve overlay provider MAY disable this
 capability for example when encryption is performed by the Tenant System
 and that level of confidentiality is believed to be sufficient. In order
@@ -468,7 +468,7 @@ provider SHOULD evaluate its impact.
 A Geneve security mechanism must fulfill the requirements
 below: 
 
-* SEC-GEN-8: Geneve Security mechanism MUST provide means for a
+* SEC-GEN-7: Geneve Security mechanism MUST provide means for a
 tunnel endpoint (NVE) to  authenticate data prior it is being
 processed. A tunnel endpoint (NVE) MUST be able to authenticate at
 least:
@@ -478,7 +478,7 @@ least:
   * the Geneve Header, a subset of Geneve options and the Geneve
   inner payload or the portion of the inner payload in case the Tenant's
 System provides some authentication mechanism.    
-* SEC-GEN-9: Geneve Security mechanism SHOULD provide means for a
+* SEC-GEN-8: Geneve Security mechanism SHOULD provide means for a
 transit device to authenticate the Geneve Option prior processing it.
 Authentication MAY concern the whole Geneve packet, but MAY be limited
 to the Geneve Option. 
@@ -547,7 +547,7 @@ anti replay protection.
 A Geneve security mechanism must fulfill the requirements
 below: 
 
-* SEC-GEN-10: Geneve Security mechanism MUST provide means for a
+* SEC-GEN-9: Geneve Security mechanism MUST provide means for a
 tunnel endpoint (NVE) to validate the Geneve Header corresponds to the
 Geneve payload, and discard such packets.
 
@@ -569,17 +569,17 @@ enabled to protect the flow.
 A Geneve security mechanism must fulfill the requirements
 below: 
 
-* SEC-GEN-11: A Geneve security mechanism MUST be managed via security
+* SEC-GEN-10: A Geneve security mechanism MUST be managed via security
 policies associated for each traffic flow to be protected.  Geneve
 overlay provider MUST be able to configure NVEs with  different
 security policies for different flows. A flow MUST be identified at
 minimum by the Geneve virtual network identifier and the inner IP and
 transport headers, and optionally additional fields which define a flow
 (e.g., inner IP DSCP, IPv6 flow id, Geneve options).  
-* SEC-GEN-12: A Geneve security mechanism MUST be able to assign
+* SEC-GEN-11: A Geneve security mechanism MUST be able to assign
 different cryptographic keys to protect the unicast tunnels between NVEs
 respectively.  
-*  SEC-GEN-13: A Geneve security mechanisms, when multicast is used,
+*  SEC-GEN-12: A Geneve security mechanisms, when multicast is used,
 packets,MUST be able to assign distinct cryptographic group keys to
 protect the multicast packets exchanged among the NVEs within different
 multicast groups. Upon receiving a data packet, an egress Geneve NVE
